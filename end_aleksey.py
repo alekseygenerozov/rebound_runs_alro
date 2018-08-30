@@ -44,7 +44,7 @@ def bin_find(sim):
 
 
 #Define variables
-N = 99 # number of stars
+N = 100 # number of stars
 pRun = 500 # number of orbital periods to run the simulation
 pOut = 1 # number of orbital periods between output files
 
