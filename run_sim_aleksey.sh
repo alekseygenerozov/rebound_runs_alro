@@ -10,6 +10,6 @@
 #SBATCH --mail-user=alge9397@colorado.edu
 
 module load python/2.7.11
-chmod 755 ./end.py
+chmod 755 ./end_aleksey
 
 python end_aleksey.py
