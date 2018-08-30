@@ -4,6 +4,8 @@
 
 # This program simulates an eccentric disk of stars around a supermassive black hole
 
+import sys
+sys.path.append('/usr/local/lib/python2.7/dist-packages/')
 import rebound
 import numpy as np
 import matplotlib.pyplot as plt
@@ -71,16 +73,12 @@ for l in range(0,N): # Adds stars
 	sim.add(m = 5e-5, a = a[l], e = 0.7, inc = i[l], Omega = 0, omega = 0, M = M[l]) 
 
 ##Set up simulation archive...
-sim.automateSimulationArchive("archive.bin",interval=2.*np.pi*pOut,deletefile=True)
+sim.automateSimulationArchive("archive.bin",interval=0.2*np.pi*pOut,deletefile=True)
 # This loop runs the simulation and prints output files every pOut orbital periods
-time = np.linspace(0, pRun, (pRun / pOut) + 1)
 
-# print t 
-for i in time:
-	sim.move_to_com()
-	sim.integrate(2 * np.pi * i)
-	bin_find(sim)
-	print "Reached", int(i), "orbital periods."
+
+sim.move_to_com()
+sim.integrate(pRun*2*np.pi)
 	
 print "Done."
 # Sanity check: plots end orbits
