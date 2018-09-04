@@ -52,7 +52,7 @@ for l in range(0,N): # Adds stars
 bins=bin_find(sim)
 bins=np.array(bins)
 ##Delete in reverse order (else the indices would become messed up)
-to_del=np.sort(np.bins[:,1])[::-1]
+to_del=np.sort(bins[:,1])[::-1]
 print to_del
 print len(sim)
 for idx in to_del:
