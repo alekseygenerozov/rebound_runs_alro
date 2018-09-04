@@ -1,8 +1,8 @@
-# Created by Hayden Foote 
+# Created by Hayden Foote/ Adapted by Aleksey Generozov
 # JILA | Madigan Group | CU Boulder | January 2018
-# Version 1.1 with one changed mass star
 
 # This program simulates an eccentric disk of stars around a supermassive black hole
+
 
 import sys
 sys.path.append('/usr/local/lib/python2.7/dist-packages/')
@@ -10,6 +10,7 @@ import rebound
 import numpy as np
 import matplotlib.pyplot as plt
 import random as rand
+from rebound_runs.bin_find import bin_find
 
 print rebound.__version__
 
@@ -28,7 +29,7 @@ def density2(min1, max1):
     return (1./min1-r*(1./min1-1./max1))**-1.
 
 #Define variables
-N = 100 # number of stars
+N = 110 # number of stars
 pRun = 500 # number of orbital periods to run the simulation
 pOut = 1 # number of orbital periods between output files
 
@@ -47,10 +48,20 @@ sim.add(m = 1) # BH
 for l in range(0,N): # Adds stars
 	sim.add(m = 5e-5, a = density(1.,2.), e = 0.7, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l]) 
 
+##Delete primordial binaries
+bins=bin_find(sim)
+bins=np.array(bins)
+##Delete in reverse order (else the indices would become messed up)
+to_del=np.sort(np.bins[:,1])[::-1]
+print to_del
+print len(sim)
+for idx in to_del:
+    sim.remove(idx)
+print len(sim)
+
 ##Set up simulation archive...
 sim.automateSimulationArchive("archive.bin",interval=0.2*np.pi*pOut,deletefile=True)
 # This loop runs the simulation and prints output files every pOut orbital periods
-
 
 sim.move_to_com()
 sim.integrate(pRun*2*np.pi)

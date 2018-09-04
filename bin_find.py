@@ -1,5 +1,15 @@
 from itertools import combinations
 
+def get_com(ps):
+    '''
+    Get center of mass for a collection of particles
+    '''
+    com=ps[0].m*ps[0]
+    ms=ps[0].m
+    for pp in ps[1:]:
+        com=com+pp.m*pp
+        ms+=pp.m
+    return com/ms
 
 def bin_find(sim):
     ##Ensure we are in the com frame of the simulation.
@@ -25,7 +35,7 @@ def bin_find(sim):
         ke=0.5*m1*v12+0.5*m2*v22
         d2 = dp.x*dp.x+dp.y*dp.y+dp.z*dp.z
         pe=sim.G*(m1*m2)/d2**0.5
-        
+        ##Distance of binary center of mass from COM of system (should be near central SMBH)
         com_d=(com.x**2.+com.y**2.+com.z**2.)**0.5
         a_bin=(sim.G*m1*m2)/(2.*(pe-ke))
         ##Hill sphere condition.
@@ -34,7 +44,7 @@ def bin_find(sim):
         ##If the kinetic energy is less than the potential energy 
         if ((ke<pe) and (inside_hill)):
             i+=1
-            bin_indics.append([i1, i2, d2**0.5, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), a_bin, inside_hill, ke<pe])
+            bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d)])
     return bin_indics
 
 def td(sim, i1, i2):
