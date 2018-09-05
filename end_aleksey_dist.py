@@ -52,12 +52,12 @@ for l in range(0,N): # Adds stars
 bins=bin_find(sim)
 bins=np.array(bins)
 ##Delete in reverse order (else the indices would become messed up)
-to_del=np.sort(bins[:,1])[::-1]
+to_del=(np.sort(bins[:,1])[::-1]).astype(int)
 print to_del
-print len(sim)
+print len(sim.particles)
 for idx in to_del:
     sim.remove(idx)
-print len(sim)
+print len(sim.particles)
 
 ##Set up simulation archive...
 sim.automateSimulationArchive("archive.bin",interval=0.2*np.pi*pOut,deletefile=True)
