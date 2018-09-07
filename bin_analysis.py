@@ -51,9 +51,7 @@ def bin_props(p1, p2):
 	j_com=(m1+m2)*np.cross(com.xyz, com.vxyz)
 
 	inc=np.arccos(np.dot(j_bin, j_com)/np.linalg.norm(j_bin)/np.linalg.norm(j_com))*180./np.pi
-
 	mu=m1*m2/(m1+m2)
-
 	e_bin=(1.-np.linalg.norm(j_bin)**2./((m1+m2)*a_bin)/(mu**2.))
 
 	return com_d, a_bin, e_bin, p1_com, p2_com, d2, inc
@@ -80,7 +78,7 @@ def bin_find(loc):
 		if ((a_bin>0) and (inside_hill)):
 			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin])
 
-	return bin_indics
+	return np.array(bin_indics)
 
 def p_dist(loc, idx):
 	t,name=loc
@@ -141,44 +139,6 @@ def com_plot(sa_name, i1, i2, extras=[], name='', cols=['r', 'g', 'k'], idx_min=
 		fig.savefig(sa_name.replace('.bin', '')+name+'_com_{0:03d}.png'.format(ii), bbox_inches='tight', pad_inches=0)
 		ann.remove()
 
-def com_plot_xz(sa_name, i1, i2, extras=[], name='', inset=False, cols=['r', 'g', 'k'], idx_min=0, idx_max=None):
-	fig,ax=plt.subplots(figsize=(10,9))
-	ax.set_xlim(-0.1,  0.1)
-	ax.set_ylim(-0.1, 0.1)
-	if inset:
-		ax2 = fig.add_axes([0.5, 0.6, 0.2,0.2])
-	
-	sa = rebound.SimulationArchive(sa_name)
-	if not idx_max:
-		idx_max=len(sa)
-	m0=sa[0].particles[0].m
-	for ii in range(idx_min, idx_max):
-		sim=sa[ii]
-		p1,p2=sim.particles[i1],sim.particles[i2]
-		m1,m2=p1.m,p2.m
-		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc = bin_props(p1,p2)
-		p1_pos=p1_com.x, p1_com.z
-		p2_pos=p2_com.x, p2_com.z
-		com=get_com([p1, p2])
-
-		ann=ax.annotate('a={0:2.2g}, a/rt={1:2.2g}, r={2:2.2g}\n e^2={3:2.2g}, 1-e^2={4:2.2g}, i={5:2.2g}'.format(a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), com_d, e_bin, 1-e_bin, inc), (0.09, 0.09), horizontalalignment='right',\
-							verticalalignment=20, fontsize=20)
-		ax.plot(p1_pos[0], p1_pos[1], 'o', markersize=2, color=cols[0])
-		ax.plot(p2_pos[0], p2_pos[1], 'o', markersize=2, color=cols[1])
-		for jj, extra in enumerate(extras):
-			ax.plot(sim.particles[extra].x-com.x, sim.particles[extra].z-com.z, 'o', markersize=2, color=cols[(2+jj)%len(cols)])
-		if inset:
-			ax2.set_xlim(-(1+e_bin**0.5)*a_bin, (1+e_bin**0.5)*a_bin)
-			ax2.set_ylim(-(1+e_bin**0.5)*a_bin, (1+e_bin**0.5)*a_bin)
-			ax2.plot(p1_pos[0], p1_pos[1], 'o', markersize=2, color=cols[0])
-			ax2.plot(p2_pos[0], p2_pos[1], 'o', markersize=2, color=cols[1])
-
-			for jj,extra in enumerate(extras):
-				ax.plot(sim.particles[extra].x-com.x, sim.particles[extra].z-com.z, 'o', markersize=2, color=cols[(2+jj)%len(cols)])
-		# print name+'com2_{0:03d}.png'.format(ii)
-		fig.savefig(sa_name.replace('.bin', '')+name+'_com_{0:03d}.png'.format(ii))
-		ann.remove()
-
 class BinAnalysis(object):
 	def __init__(self, sa_name):
 		'''
@@ -205,7 +165,7 @@ class BinAnalysis(object):
 	def __bin_init__(self):
 		pool = rebound.InterruptiblePool(processes=3)
 		bins = pool.map(bin_find,self.locs)
-		bins=np.array(bins)
+		#bins=np.array(bins)
 		filt=[bins[i]!=[] for i in range(len(bins))]
 		bins2=np.array(bins[filt])
 		bins2=np.concatenate(bins2)
