@@ -132,7 +132,7 @@ def com_plot(sa_name, i1, i2, extras=[], name='', cols=['r', 'g', 'k'], idx_min=
 				# for jj,extra in enumerate(extras):
 				# 	ax.plot(sim.particles[extra].x-com.x, sim.particles[extra].y-com.y, 'o', markersize=2, color=cols[(2+jj)%len(cols)])
 			# print name+'com2_{0:03d}.png'.format(ii)
-		ann=ax[1].annotate('a={0:2.2g}, a/rt={1:2.2g}, r={2:2.2g}\n e^2={3:2.2g}, 1-e^2={4:2.2g}\n i={5:2.2g}'\
+		ann=ax[1].annotate('a={0:2.2g}, a,/rt={1:2.2g}, r={2:2.2g}\n e^2={3:2.2g}, 1-e^2={4:2.2g}\n i={5:2.2g}'\
 			.format(a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), com_d, e_bin, 1-e_bin, inc),\
 			(0.9*lim, 0.9*lim), horizontalalignment='right',verticalalignment='top', fontsize=20)
 		#fig.canvas.print_png(open(sa_name.replace('.bin', '')+name+'_com_{0:03d}.png'.format(ii), 'w'))
@@ -148,7 +148,7 @@ class BinAnalysis(object):
 		sa = rebound.SimulationArchive(sa_name)
 
 		self.m0=sa[0].particles[0].m
-		self.ts= [sim.t for sim in sa]
+		self.ts= np.array([sim.t for sim in sa])
 		self.delta_t=np.diff(self.ts)[0]
 		self.locs = [[sim.t, sa_name] for sim in sa]
 		try:
@@ -211,13 +211,14 @@ class BinAnalysis(object):
 			t_surv=t_bin[-1]-t_bin[0]
 			#Index of one of the stars in the pair
 			idx=self.pairs_arr[pairs==pp][0,1]
-			diffs=np.diff(t_bin)
-			
-			##Edge case: Binary splits up and forms again. In this case the survival time 
-			##in longest continuous span of time for which the binary was intact.
-			##NB detection of discontinuous time intervals may need modification.
-			if np.any(diffs>1.01*self.delta_t):
-				tmp=np.split(t_bin, np.where(diffs>1.01*self.delta_t)[0]+1)
+			idx2=self.pairs_arr[pairs==pp][0,0]
+
+			##Edge case: Binary splits up and forms again. See if the binary has skipped any snapshots.
+			##snapshots may not be exactly evenly spaced, so it is best to to use the to if the binary 
+			##has skipped any snapshots...
+			diffs=np.diff([np.where(self.ts==t_bin[ii])[0][0] for ii in range(len(t_bin))])
+			if np.any(diffs>1.01):
+				tmp=np.split(t_bin, np.where(diffs>1.01)[0]+1)
 				tmp2=[tmp[i][-1]-tmp[i][0] for i in range(len(tmp))]
 				order=np.argsort(tmp2)
 				t_bin=tmp[order[-1]]
@@ -227,7 +228,11 @@ class BinAnalysis(object):
 			##(we use the orbital period of one of the stars in the binary as a proxy). 
 			sim=sa.getSimulation(t_bin[-1])
 			sim.move_to_com()
-			t_orb=sim.particles[idx].P
+			#t_orb=sim.particles[idx].P
+			##Binary orbital period -- not this is not a constant--take the minimum orbital period 
+			m1=sa[0].particles[idx].m
+			m2=sa[0].particles[idx2].m
+			t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
 			t_survs[ii]=t_surv/t_orb
 		return t_survs
 
