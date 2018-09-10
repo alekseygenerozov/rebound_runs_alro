@@ -29,7 +29,7 @@ def density2(min1, max1):
     return (1./min1-r*(1./min1-1./max1))**-1.
 
 #Define variables
-N = 110 # number of stars
+N = 220 # number of stars
 pRun = 500 # number of orbital periods to run the simulation
 pOut = 1 # number of orbital periods between output files
 

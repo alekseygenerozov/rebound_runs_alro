@@ -29,7 +29,7 @@ def density2(min1, max1):
     return (1./min1-r*(1./min1-1./max1))**-1.
 
 #Define variables
-N = 110 # number of stars
+N = 440 # number of stars
 pRun = 500 # number of orbital periods to run the simulation
 pOut = 1 # number of orbital periods between output files
 
@@ -46,7 +46,7 @@ sim.add(m = 1) # BH
 # sim.add(m = 5e-3, a = 1.3, e = 0.7, inc = 0, Omega = 0, omega = 0, M = M[-1])  # One massive object, want M+Nm = .01
 
 for l in range(0,N): # Adds stars
-	sim.add(m = 5e-5, a = density(1.,2.), e = 0.7, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l]) 
+	sim.add(m = 1.25e-5, a = density(1.,2.), e = 0.7, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l]) 
 
 ##Delete primordial binaries
 bins=bin_find(sim)
