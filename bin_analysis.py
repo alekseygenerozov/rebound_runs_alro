@@ -80,6 +80,26 @@ def bin_find(loc):
 
 	return np.array(bin_indics)
 
+
+def bin_find_sim(sim):
+	##Ensure we are in the com frame of the simulation.
+	sim.move_to_com()
+	ps = sim.particles
+	##mass of of primary 
+	m0 = ps[0].m
+	bin_indics=[]
+	for i1, i2 in combinations(range(1, sim.N),2): # get all pairs of indices/start at 1 to exclude SMBH
+		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc = bin_props(ps[i1], ps[i2])
+		m1,m2 =ps[i1].m, ps[i2].m
+		##Hill sphere condition.
+		inside_hill=(a_bin<((m1+m2)/m0)**(1./3.)*com_d)
+
+		##If the kinetic energy is less than the potential energy 
+		if ((a_bin>0) and (inside_hill)):
+			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin])
+
+	return np.array(bin_indics)
+
 def p_dist(loc, idx):
 	t,name=loc
 	sat = rebound.SimulationArchive(name)

@@ -10,7 +10,7 @@ import rebound
 import numpy as np
 import matplotlib.pyplot as plt
 import random as rand
-from rebound_runs.bin_find import bin_find
+from rebound_runs.bin_analysis import bin_find_sim
 
 print rebound.__version__
 
@@ -49,7 +49,7 @@ for l in range(0,N): # Adds stars
 	sim.add(m = 2.5e-5, a = density(1.,2.), e = 0.7, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l]) 
 
 ##Delete primordial binaries
-bins=bin_find(sim)
+bins=bin_find_sim(sim)
 bins=np.array(bins)
 ##Delete in reverse order (else the indices would become messed up)
 to_del=(np.sort(bins[:,1])[::-1]).astype(int)
