@@ -3,7 +3,6 @@
 
 # This program simulates an eccentric disk of stars around a supermassive black hole
 
-
 import sys
 sys.path.append('/usr/local/lib/python2.7/dist-packages/')
 import rebound
@@ -13,6 +12,7 @@ import random as rand
 from rebound_runs.bin_analysis import bin_find_sim
 
 print rebound.__version__
+import sys
 
 # Density function for semimajor axes (Hayden's implementation)
 def density(min1, max1):
@@ -29,7 +29,7 @@ def density2(min1, max1):
     return (1./min1-r*(1./min1-1./max1))**-1.
 
 #Define variables
-N = 110 # number of stars
+N = int(sys.argv[1]) # number of stars
 pRun = 500 # number of orbital periods to run the simulation
 pOut = 1 # number of orbital periods between output files
 
@@ -46,21 +46,21 @@ sim.add(m = 1) # BH
 # sim.add(m = 5e-3, a = 1.3, e = 0.7, inc = 0, Omega = 0, omega = 0, M = M[-1])  # One massive object, want M+Nm = .01
 
 for l in range(0,N): # Adds stars
-	sim.add(m = 5e-5, a = density(1.,2.), e = 0.7, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l]) 
+	sim.add(m = float(sys.argv[2]), a = density(1.,2.), e = 0.7, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l]) 
 
 ##Delete primordial binaries
 bins=bin_find_sim(sim)
 bins=np.array(bins)
 ##Delete in reverse order (else the indices would become messed up)
 to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
-print to_del
+print len(to_del)
 print len(sim.particles)
-for idx in to_del:
-    sim.remove(idx)
+# for idx in to_del:
+#     sim.remove(idx)
 print len(sim.particles)
 
 ##Set up simulation archive...
-sim.automateSimulationArchive("archive.bin",interval=0.2*np.pi*pOut,deletefile=True)
+sim.automateSimulationArchive("archive_{0}.bin".format(sys.argv[3]),interval=0.2*np.pi*pOut,deletefile=True)
 # This loop runs the simulation and prints output files every pOut orbital periods
 
 sim.move_to_com()
