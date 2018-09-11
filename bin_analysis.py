@@ -187,7 +187,7 @@ class BinAnalysis(object):
 		bins = pool.map(bin_find,self.locs)
 		#bins=np.array(bins)
 		filt=[bins[i]!=[] for i in range(len(bins))]
-		bins2=np.array(bins[filt])
+		bins2=np.array(bins)[filt]
 		bins2=np.concatenate(bins2)
 		self.bins=bins2
 
