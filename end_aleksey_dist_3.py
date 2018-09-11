@@ -52,15 +52,14 @@ for l in range(0,N): # Adds stars
 bins=bin_find_sim(sim)
 bins=np.array(bins)
 ##Delete in reverse order (else the indices would become messed up)
-to_del=(np.sort(bins[:,1])[::-1]).astype(int)
-print to_del
+to_del=np.unique((np.sort(bins[:,1])[::-1]).astype(int))print to_del
 print len(sim.particles)
 for idx in to_del:
     sim.remove(idx)
 print len(sim.particles)
 
 ##Set up simulation archive...
-sim.automateSimulationArchive("archive.bin",interval=0.2*np.pi*pOut,deletefile=True)
+sim.automateSimulationArchive("archive_3.bin",interval=0.2*np.pi*pOut,deletefile=True)
 # This loop runs the simulation and prints output files every pOut orbital periods
 
 sim.move_to_com()
