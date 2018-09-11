@@ -52,7 +52,7 @@ for l in range(0,N): # Adds stars
 bins=bin_find_sim(sim)
 bins=np.array(bins)
 ##Delete in reverse order (else the indices would become messed up)
-to_del=np.unique((np.sort(bins[:,1])[::-1]).astype(int))
+to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
 print to_del
 print len(sim.particles)
 for idx in to_del:

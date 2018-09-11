@@ -29,7 +29,7 @@ def density2(min1, max1):
     return (1./min1-r*(1./min1-1./max1))**-1.
 
 #Define variables
-N = 440 # number of stars
+N = 400 # number of stars
 pRun = 500 # number of orbital periods to run the simulation
 pOut = 1 # number of orbital periods between output files
 
@@ -52,11 +52,12 @@ for l in range(0,N): # Adds stars
 bins=bin_find_sim(sim)
 bins=np.array(bins)
 ##Delete in reverse order (else the indices would become messed up)
-to_del=np.unique((np.sort(bins[:,1])[::-1]).astype(int))
+to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
+
 print to_del
 print len(sim.particles)
-for idx in to_del:
-    sim.remove(idx)
+# for idx in to_del:
+#     sim.remove(idx)
 print len(sim.particles)
 
 ##Set up simulation archive...
