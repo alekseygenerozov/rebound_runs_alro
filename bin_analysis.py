@@ -24,6 +24,7 @@ def bin_props(p1, p2):
 	p1 and p2 -- Two particles from a rebound simulation.
 	'''
 	dp = p1 - p2   
+	d2 = dp.x*dp.x+dp.y*dp.y+dp.z*dp.z
 	##Calculate com velocity of two particles...
 	##Masses
 	m1=p1.m
@@ -36,11 +37,18 @@ def bin_props(p1, p2):
 	v22 = (p2_com.vx**2.+p2_com.vy**2.+p2_com.vz**2.)
 
 	d12 = (p1_com.x**2.+p1_com.y**2.+p1_com.z**2.)
-	d22 = (p2_com.vx**2.+p2_com.y**2.+p2_com.z**2.)			
+	d22 = (p2_com.vx**2.+p2_com.y**2.+p2_com.z**2.)	
+	##Difference in the forces acting on the two particles;
+	ft = np.array([m2*(p2.ax)-m2*(com.ax), m2*(p2.ay)-m2*(com.ay), m2*(p2.az)-m2*com.az])
+	##Unit vector pointing from particle 2 to particle 1
+	rhat = np.array(dp.xyz)/d2**0.5
+	f12 = m1*m2/d2*rhat 
+	##Subtract the mutual force between the two stars
+	ft = ft - f12
+	ft = np.linalg.norm(ft)
 
 	##Kinetic and potential energies
 	ke = 0.5*m1*v12+0.5*m2*v22
-	d2 = dp.x*dp.x+dp.y*dp.y+dp.z*dp.z
 	##Assumes G has been set to 1.
 	pe = (m1*m2)/d2**0.5
 
@@ -54,7 +62,7 @@ def bin_props(p1, p2):
 	mu=m1*m2/(m1+m2)
 	e_bin=(1.-np.linalg.norm(j_bin)**2./((m1+m2)*a_bin)/(mu**2.))
 
-	return com_d, a_bin, e_bin, p1_com, p2_com, d2, inc
+	return com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft
 
 
 def bin_find(loc):
@@ -69,13 +77,15 @@ def bin_find(loc):
 	m0 = ps[0].m
 	bin_indics=[]
 	for i1, i2 in combinations(range(1, sim.N),2): # get all pairs of indices/start at 1 to exclude SMBH
-		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc = bin_props(ps[i1], ps[i2])
+		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(ps[i1], ps[i2])
 		m1,m2 =ps[i1].m, ps[i2].m
 		##Hill sphere condition.
 		inside_hill=(a_bin<((m1+m2)/m0)**(1./3.)*com_d)
+		tidal_2 = (m1*m2/d2>ft)
 
 		##If the kinetic energy is less than the potential energy 
-		if ((a_bin>0) and (inside_hill)):
+		if ((a_bin>0) and (inside_hill) and (tidal_2)):
+		#if ((a_bin>0) and (inside_hill)):
 			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin])
 
 	return np.array(bin_indics)
@@ -89,13 +99,14 @@ def bin_find_sim(sim):
 	m0 = ps[0].m
 	bin_indics=[]
 	for i1, i2 in combinations(range(1, sim.N),2): # get all pairs of indices/start at 1 to exclude SMBH
-		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc = bin_props(ps[i1], ps[i2])
+		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(ps[i1], ps[i2])
 		m1,m2 =ps[i1].m, ps[i2].m
 		##Hill sphere condition.
 		inside_hill=(a_bin<((m1+m2)/m0)**(1./3.)*com_d)
+		tidal_2 = (m1*m2/d2>ft)
 
 		##If the kinetic energy is less than the potential energy 
-		if ((a_bin>0) and (inside_hill)):
+		if ((a_bin>0) and (inside_hill) and (tidal_2)):
 			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin])
 
 	return np.array(bin_indics)
@@ -134,7 +145,7 @@ def com_plot(sa_name, i1, i2, extras=[], name='', cols=['r', 'g', 'k'], idx_min=
 			sim=sa[ii]
 			p1,p2=sim.particles[i1],sim.particles[i2]
 			m1,m2=p1.m,p2.m
-			com_d, a_bin, e_bin, p1_com, p2_com, d2, inc = bin_props(p1,p2)
+			com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(p1,p2)
 			p1_pos=getattr(p1_com, plane[0]), getattr(p1_com, plane[1])
 			p2_pos=getattr(p2_com, plane[0]), getattr(p2_com, plane[1])
 			com=get_com([p1, p2])
@@ -186,7 +197,7 @@ class BinAnalysis(object):
 		pool = rebound.InterruptiblePool(processes=3)
 		bins = pool.map(bin_find,self.locs)
 		#bins=np.array(bins)
-		filt=[bins[i]!=[] for i in range(len(bins))]
+		filt=[len(bins[i])>0 for i in range(len(bins))]
 		bins2=np.array(bins)[filt]
 		bins2=np.concatenate(bins2)
 		self.bins=bins2

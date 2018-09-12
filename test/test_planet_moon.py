@@ -21,6 +21,7 @@ sim2.add(m = 3e-6, a=1., inc=0.) #Planet
 sim2.add(m = 3e-10, a=a_bin, e=e_bin, inc=inc_bin, primary=sim2.particles[1]) #Moon
 
 bc.bash_command('rm test.bin')
+sim2.integrate(1.0e-10)
 sim2.simulationarchive_snapshot('test.bin')
 
 
@@ -28,11 +29,11 @@ def test_bin_props():
 	x=bin_analysis.bin_props(sim2.particles[1], sim2.particles[2])
 	assert abs(x[1]-a_bin)/a_bin<tol
 	assert abs(x[2]**0.5-e_bin)/e_bin<tol
-	print x[-1]*np.pi/180.
-	assert abs(x[-1]*np.pi/180.-inc_bin)/inc_bin<tol
+	print x[-2]*np.pi/180.
+	assert abs(x[-2]*np.pi/180.-inc_bin)/inc_bin<tol
 
 def test_bin_find():
-	bins=bin_analysis.bin_find([0, 'test.bin'])
+	bins=bin_analysis.bin_find([1.0e-10, 'test.bin'])
 	print bins
 	assert (len(bins)==1)
 	assert set(bins[0,[1,2]])=={1,2}
