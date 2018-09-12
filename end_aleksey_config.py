@@ -42,12 +42,13 @@ def main():
 	config_file=args.config[0]
 	tag=str(uuid.uuid4())
 
-	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive_{0}.bin'.format(tag), 'N':'100', 'e':'0.7',\
+	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',\
 		'a_min':'1.', 'a_max':'2.', 'm':'5e-5', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
 
 	name=config.get('params', 'name')
+	name=name+"_"+tag+".bin"
 	N=int(config.get('params', 'N'))
 	e=config.getfloat('params', 'e')
 	m=config.getfloat('params', 'm')
