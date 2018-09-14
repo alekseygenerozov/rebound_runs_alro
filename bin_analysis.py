@@ -66,6 +66,14 @@ def bin_props(p1, p2):
 
 
 def bin_find(loc):
+	'''
+	Find all binaries for a given sim and time. 
+
+	loc should be a tuple containing the time and 
+	simulation name
+
+	
+	'''
 	##Ensure we are in the com frame of the simulation.
 	t,name=loc
 	sat = rebound.SimulationArchive(name)
@@ -176,15 +184,15 @@ class BinAnalysis(object):
 		Getting properties of all of the binaries in a rebound simulation run.
 		'''
 		self.sa_name=sa_name
-		sa = rebound.SimulationArchive(sa_name)
-
+		sa=rebound.SimulationArchive(sa_name)
 		self.m0=sa[0].particles[0].m
-		self.ts= np.array([sim.t for sim in sa])
+		self.ts= np.genfromtxt(sa_name.replace('.bin', '_times'))
 		self.delta_t=np.diff(self.ts)[0]
-		self.locs = [[sim.t, sa_name] for sim in sa]
+		self.locs = [[tt, sa_name] for tt in self.ts]
 		try:
 			self.bins=np.genfromtxt(sa_name.replace('.bin','_bins.csv'), delimiter=',')
 		except:
+			print "Generating bin table"
 			self.__bin_init__()
 
 		self.pairs_arr=self.bins[:,[1,2]].astype(int)
