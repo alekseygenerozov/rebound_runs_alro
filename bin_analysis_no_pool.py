@@ -195,11 +195,10 @@ class BinAnalysis(object):
 
 	def __bin_init__(self):
 		#pool = rebound.InterruptiblePool(processes=3)
-		bins = map(bin_find,self.locs[:10])
+		bins = map(bin_find,self.locs)
 		#bins=np.array(bins)
 		filt=np.array([len(bins[i])>0 for i in range(len(bins))])
 		bins2=np.array(bins)[filt]
-                print bins2
 		bins2=np.concatenate(bins2)
 		self.bins=bins2
 
