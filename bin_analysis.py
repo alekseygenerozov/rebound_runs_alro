@@ -43,23 +43,27 @@ def bin_props(p1, p2):
 	##Unit vector pointing from particle 2 to particle 1
 	rhat = np.array(dp.xyz)/d2**0.5
 	f12 = m1*m2/d2*rhat 
-	##Subtract the mutual force between the two stars
+	##Subtract the mutual force between the two stars; this leaves the tidal force the star experiences
 	ft = ft - f12
 	ft = np.linalg.norm(ft)
 
 	##Kinetic and potential energies
 	ke = 0.5*m1*v12+0.5*m2*v22
-	##Assumes G has been set to 1.
+	##Potential energy; Assumes G = 1
 	pe = (m1*m2)/d2**0.5
 
 	##Distance of binary center of mass from COM of system (should be near central SMBH)
 	com_d=(com.x**2.+com.y**2.+com.z**2.)**0.5
 	a_bin=(m1*m2)/(2.*(pe-ke))
+	##Angular momentum in binary com
 	j_bin=m1*np.cross(p1_com.xyz, p1_com.vxyz)+m2*np.cross(p2_com.xyz, p2_com.vxyz)
+	##Angular momentum of binary com
 	j_com=(m1+m2)*np.cross(com.xyz, com.vxyz)
 
+	#Inclination of star's orbit wrt the binary's orbit win the disk 
 	inc=np.arccos(np.dot(j_bin, j_com)/np.linalg.norm(j_bin)/np.linalg.norm(j_com))*180./np.pi
 	mu=m1*m2/(m1+m2)
+	##Eccentricity of the binary
 	e_bin=(1.-np.linalg.norm(j_bin)**2./((m1+m2)*a_bin)/(mu**2.))
 
 	return com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft
@@ -70,21 +74,30 @@ def bin_find(loc):
 	Find all binaries for a given sim and time. 
 
 	loc should be a tuple containing the time and 
-	simulation name
+	simulation name. (bin_find_sim below 
+	performs the same function but accepts
+	a simulation object; this version is useful 
+	because it can be used w rebound's InterruptiblePool)
 
-	
+	Return a numpy array. 1st columnn is time, 2nd and 3rd columns
+	are indices of the binary stars. 
+
+	Next columns are binary separation, sma, ratio of sma to the hill radius, 
+	and the binary eccentricity. 
+
 	'''
-	##Ensure we are in the com frame of the simulation.
 	t,name=loc
 	sat = rebound.SimulationArchive(name)
 	sim = sat.getSimulation(t)
 
+	##Ensure we are in the com frame of the simulation.
 	sim.move_to_com()
 	ps = sim.particles
-	##mass of of primary 
+	##Mass of central SMBH
 	m0 = ps[0].m
 	bin_indics=[]
 	for i1, i2 in combinations(range(1, sim.N),2): # get all pairs of indices/start at 1 to exclude SMBH
+		##Call bin_props above to extract binary properties
 		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(ps[i1], ps[i2])
 		m1,m2 =ps[i1].m, ps[i2].m
 		##Hill sphere condition.
