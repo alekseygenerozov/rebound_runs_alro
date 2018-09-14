@@ -3,8 +3,8 @@
 
 # This program simulates an eccentric disk of stars around a supermassive black hole
 
-import sys
-sys.path.append('/usr/local/lib/python2.7/dist-packages/')
+#import sys
+#sys.path.append('/usr/local/lib/python2.7/dist-packages/')
 import rebound
 import numpy as np
 import matplotlib.pyplot as plt
