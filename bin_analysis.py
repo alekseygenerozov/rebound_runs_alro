@@ -208,14 +208,15 @@ class BinAnalysis(object):
 		self.sa_name=sa_name
 		sa=rebound.SimulationArchive(sa_name)
 		self.m0=sa[0].particles[0].m
-		self.ts= np.genfromtxt(sa_name.replace('.bin', '_times'))
-		self.delta_t=np.diff(self.ts)[0]
-		self.locs = [[tt, sa_name] for tt in self.ts]
+		
 		try:
+			self.ts= np.genfromtxt(sa_name.replace('.bin', '_times'))
 			self.bins=np.genfromtxt(sa_name.replace('.bin','_bins.csv'), delimiter=',')
 		except:
 			print "Generating bin table"
 			self.__bin_init__()
+		self.delta_t=np.diff(self.ts)[0]
+		#self.locs = [[tt, sa_name] for tt in self.ts]
 
 		self.pairs_arr=self.bins[:,[1,2]].astype(int)
 		self.times_arr=self.bins[:,0]
@@ -224,8 +225,12 @@ class BinAnalysis(object):
 
 
 	def __bin_init__(self):
-		pool = rebound.InterruptiblePool(processes=3)
-		bins = pool.map(bin_find,self.locs)
+		sa = rebound.SimulationArchive(self.sa_name)
+		self.ts=[sim.t for sim in sa] 
+		np.savetxt(self.sa_name.replace('.bin', '_times'), self.ts)
+		locs = [[tt, self.sa_name] for tt in self.ts]
+		#pool = rebound.InterruptiblePool(processes=3)
+		bins = map(bin_find,locs)
 		#bins=np.array(bins)
 		filt=np.array([len(bins[i])>0 for i in range(len(bins))])
 		bins2=np.array(bins)[filt]
