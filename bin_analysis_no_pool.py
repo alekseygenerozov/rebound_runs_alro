@@ -74,7 +74,7 @@ def bin_find(loc):
 	##Integrate forward for a small time to ensure that the accelerations
 	##are in sync with the rest of the simulation (this is important for
 	##calculating tidal forces...
-	sim.integrate(sim.t+1.0e-15)
+	sim.integrate(sim.t+sim.t*1.0e-14)
 
 	ps = sim.particles
 	##mass of of primary 
@@ -101,7 +101,7 @@ def bin_find_sim(sim):
 	##Integrate forward for a small time to ensure that the accelerations
 	##are in sync with the rest of the simulation (this is important for
 	##calculating tidal forces...
-	sim.integrate(sim.t+1.0e-15)
+	sim.integrate(sim.t+sim.t*1.0e-14)
 
 	ps = sim.particles
 	##mass of of primary 

@@ -66,7 +66,6 @@ def bin_props(p1, p2):
 	mu=m1*m2/(m1+m2)
 	##Eccentricity of the binary
 	e_bin=(1.-np.linalg.norm(j_bin)**2./((m1+m2)*a_bin)/(mu**2.))
-	print ft,m1*m2/d2 
 
 	return com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft
 
@@ -96,7 +95,7 @@ def bin_find(loc):
 	##Integrate forward for a small time to ensure that the accelerations
 	##are in sync with the rest of the simulation (this is important for
 	##calculating tidal forces...
-	sim.integrate(sim.t+1.0e-15)
+	sim.integrate(sim.t+sim.t*1.0e-14)
 
 	ps = sim.particles
 	##Mass of central SMBH
@@ -123,7 +122,7 @@ def bin_find_sim(sim):
 	sim.move_to_com()
 	##Integrate forward for a small time to ensure that the accelerations
 	##are in sync with 
-	sim.integrate(sim.t+1.0e-15)
+	sim.integrate(sim.t+sim.t*1.0e-14)
 	
 	ps = sim.particles
 	##mass of of primary 

@@ -27,10 +27,11 @@ def density(min1, max1):
 #     return (1./min1-r*(1./min1-1./max1))**-1.
 
 def heartbeat(sim):
+	print(sim.contents.dt, sim.contents.t)
 # sim is a pointer to the simulation object,
 # thus use contents to access object data.
 # See ctypes documentation for details.
-	print(sim.contents.dt)
+	# print(sim.contents.dt)
 
 def main():
 	parser=argparse.ArgumentParser(
@@ -70,17 +71,22 @@ def main():
 		sim.add(m = m, a = density(a_min, a_max), e = e, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l])
 
 	##Integrate forward a small amount time to initialize accelerations.
-	sim.integrate(1.0e-10)
+	sim.move_to_com()
+	sim.integrate(1.0e-15)
 	bins=bin_find_sim(sim)
+
 	bins=np.array(bins)
+	print bins[:,[1,2]].astype(int)
 	##Delete in reverse order (else the indices would become messed up)
-	if len(bins>0):
+	while len(bins>0):
 		to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
 		print len(to_del)
 		print len(sim.particles)
 		for idx in to_del:
 			sim.remove(idx)
 		print len(sim.particles) 
+		sim.integrate(sim.t+sim.t*1.0e-14)
+		bins=bin_find_sim(sim)
 
 	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
 	sim.heartbeat=heartbeat
