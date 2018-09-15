@@ -17,6 +17,7 @@ def get_com(ps):
 		ms+=pp.m
 	return com/ms
 
+
 def bin_props(p1, p2):
 	'''
 	Auxiliary function to get binary properties for two particles. 
@@ -89,9 +90,13 @@ def bin_find(loc):
 	t,name=loc
 	sat = rebound.SimulationArchive(name)
 	sim = sat.getSimulation(t)
-
 	##Ensure we are in the com frame of the simulation.
 	sim.move_to_com()
+	##Integrate forward for a small time to ensure that the accelerations
+	##are in sync with the rest of the simulation (this is important for
+	##calculating tidal forces...
+	sim.integrate(1.0e-15)
+
 	ps = sim.particles
 	##Mass of central SMBH
 	m0 = ps[0].m
@@ -115,6 +120,10 @@ def bin_find(loc):
 def bin_find_sim(sim):
 	##Ensure we are in the com frame of the simulation.
 	sim.move_to_com()
+	##Integrate forward for a small time to ensure that the accelerations
+	##are in sync with 
+	sim.integrate(1.0e-15)
+	
 	ps = sim.particles
 	##mass of of primary 
 	m0 = ps[0].m
