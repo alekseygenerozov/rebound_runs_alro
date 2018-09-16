@@ -263,7 +263,7 @@ class BinAnalysis(object):
 		'''
 		Number of binaries for each snapshot of the simulation.
 		'''
-		num_bins=[len(self.times_arr[self.times_arr==tt]) for tt in self.ts]
+		num_bins=[len(self.times_arr[np.isclose(self.times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in self.ts]
 		return num_bins
 
 	def bin_times(self):
@@ -282,7 +282,7 @@ class BinAnalysis(object):
 			##Edge case: Binary splits up and forms again. See if the binary has skipped any snapshots.
 			##snapshots may not be exactly evenly spaced, so it is best to to use the to if the binary 
 			##has skipped any snapshots...
-			diffs=np.diff([np.where(self.ts==t_bin[ii])[0][0] for ii in range(len(t_bin))])
+			diffs=np.diff([np.where(np.isclose(self.ts,t_bin[ii], atol=0., rtol=1.0e-12))[0][0] for ii in range(len(t_bin))])
 			if np.any(diffs>1.01):
 				tmp=np.split(t_bin, np.where(diffs>1.01)[0]+1)
 				tmp2=[tmp[i][-1]-tmp[i][0] for i in range(len(tmp))]
