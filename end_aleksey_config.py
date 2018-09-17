@@ -50,25 +50,30 @@ def main():
 
 	name=config.get('params', 'name')
 	name=name+"_"+tag+".bin"
-	N=int(config.get('params', 'N'))
-	e=config.getfloat('params', 'e')
-	m=config.getfloat('params', 'm')
-	a_min=config.getfloat('params', 'a_min')
-	a_max=config.getfloat('params', 'a_max')
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
-	print name, N, e, m, a_max, a_min, pOut
-
-	M = np.zeros(N + 1)
-	for j in range(0, N + 1):
-		M[j] = rand.uniform(0, 2 * np.pi)
-
+	sections=config.sections()
 	sim = rebound.Simulation()
 	sim.G = 1.	
 	sim.add(m = 1) # BH
 
-	for l in range(0,N): # Adds stars
-		sim.add(m = m, a = density(a_min, a_max), e = e, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l])
+
+	for ss in sections:
+		if ss=='params':
+			continue
+		N=int(config.get(ss, 'N'))
+		e=config.getfloat(ss, 'e')
+		m=config.getfloat(ss, 'm')
+		a_min=config.getfloat(ss, 'a_min')
+		a_max=config.getfloat(ss, 'a_max')
+
+		M = np.zeros(N + 1)
+		for j in range(0, N + 1):
+			M[j] = rand.uniform(0, 2 * np.pi)
+
+		for l in range(0,N): # Adds stars
+			sim.add(m = m, a = density(a_min, a_max), e = e, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
+		print N, m, e
 
 	##Integrate forward a small amount time to initialize accelerations.
 	sim.move_to_com()
@@ -77,8 +82,8 @@ def main():
 
 	bins=np.array(bins)
 	print bins[:,[1,2]].astype(int)
-	##Delete in reverse order (else the indices would become messed up)
 	while len(bins>0):
+		##Delete in reverse order (else the indices would become messed up)
 		to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
 		print len(to_del)
 		print len(sim.particles)

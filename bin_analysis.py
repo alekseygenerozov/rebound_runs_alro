@@ -206,8 +206,8 @@ class BinAnalysis(object):
 		Getting properties of all of the binaries in a rebound simulation run.
 		'''
 		self.sa_name=sa_name
-		sa=rebound.SimulationArchive(sa_name)
-		self.m0=sa[0].particles[0].m
+		#sa=rebound.SimulationArchive(sa_name)
+		#self.m0=sa[0].particles[0].m
 		
 		try:
 			self.ts= np.genfromtxt(sa_name.replace('.bin', '_times'))
