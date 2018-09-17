@@ -43,13 +43,16 @@ def main():
 	config_file=args.config[0]
 	tag=str(uuid.uuid4())
 
+	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',\
 		'a_min':'1.', 'a_max':'2.', 'm':'5e-5', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
 
+	##Name of our put file 
 	name=config.get('params', 'name')
 	name=name+"_"+tag+".bin"
+	##Length of simulation and interval between snapshots
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
 	sections=config.sections()
@@ -57,7 +60,7 @@ def main():
 	sim.G = 1.	
 	sim.add(m = 1) # BH
 
-
+	##Add particles 
 	for ss in sections:
 		if ss=='params':
 			continue
