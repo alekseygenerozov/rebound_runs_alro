@@ -1,2 +1,9 @@
+[params]
+pRun=500
+
 [stars]
 N=120
+
+[heavies]
+N=10
+m=5.0e-4

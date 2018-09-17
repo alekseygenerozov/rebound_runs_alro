@@ -36,11 +36,12 @@ def heartbeat(sim):
 def main():
 	parser=argparse.ArgumentParser(
 		description='Set up a rebound run')
-	parser.add_argument('config', nargs=1,
-		help='File containing config information for our run.')
+	parser.add_argument('--config', nargs=1, default='config',
+		help='File containing simulation parameters')
 
 	args=parser.parse_args()
-	config_file=args.config[0]
+	config_file=args.config
+	print config_file
 	tag=str(uuid.uuid4())
 
 	##Default stellar parameters 
@@ -60,7 +61,9 @@ def main():
 	sim.G = 1.	
 	sim.add(m = 1) # BH
 
-	##Add particles 
+	##Add particles; Can have different sections with different types of particles (e.g. heavy and light)
+	##see the example config file in repository. Only require section is params which defines global parameters 
+	##for the simulation (pRun and pOut).
 	for ss in sections:
 		if ss=='params':
 			continue
@@ -76,15 +79,19 @@ def main():
 
 		for l in range(0,N): # Adds stars
 			sim.add(m = m, a = density(a_min, a_max), e = e, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
-		print N, m, e
+		print N, m, e, a_min, a_max
 
 	##Integrate forward a small amount time to initialize accelerations.
 	sim.move_to_com()
 	sim.integrate(1.0e-15)
+	##Look for binaries
 	bins=bin_find_sim(sim)
 
 	bins=np.array(bins)
 	print bins[:,[1,2]].astype(int)
+	##Delete all the binaries that we found. The identification of binaries depends in part on the tidal field 
+	##of the star cluster, and this will change as we delete stars. So we repeat the binary 
+	##deletion process several times until there are none left.
 	while len(bins>0):
 		##Delete in reverse order (else the indices would become messed up)
 		to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
@@ -96,6 +103,7 @@ def main():
 		sim.integrate(sim.t+sim.t*1.0e-14)
 		bins=bin_find_sim(sim)
 
+	##Set up simulation archive for output
 	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
 	sim.heartbeat=heartbeat
 	sim.move_to_com()
