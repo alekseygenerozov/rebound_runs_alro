@@ -56,6 +56,7 @@ def main():
 	##Length of simulation and interval between snapshots
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
+	print pRun, pOut
 	sections=config.sections()
 	sim = rebound.Simulation()
 	sim.G = 1.	
