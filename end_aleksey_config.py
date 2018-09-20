@@ -66,7 +66,7 @@ def main():
 	rt=config.getfloat('params', 'rt')
 	coll=config.get('params', 'coll')
 
-	print pRun, pOut, rt
+	print pRun, pOut, rt, coll
 	sections=config.sections()
 	sim = rebound.Simulation()
 	sim.G = 1.	

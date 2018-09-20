@@ -1,5 +1,6 @@
 [params]
+rt = 1.0e-5
+coll = line
 
 [stars]
-N=225
-e=0.
+N=120
