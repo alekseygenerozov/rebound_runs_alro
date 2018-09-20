@@ -33,6 +33,13 @@ def heartbeat(sim):
 # See ctypes documentation for details.
 	# print(sim.contents.dt)
 
+def get_tde(sim, reb_coll):
+	for idx,pp in enumerate(sim[0].particles[1:]):
+		dp=np.linalg.norm(np.array(sim[0].particles[0].xyz)-np.array(pp.xyz))
+		if dp<sim[0].particles[0].r:
+			print idx, 'TDE!'
+	return 0
+
 def main():
 	parser=argparse.ArgumentParser(
 		description='Set up a rebound run')
@@ -46,7 +53,7 @@ def main():
 
 	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',\
-		'a_min':'1.', 'a_max':'2.', 'm':'5e-5', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
+		'a_min':'1.', 'a_max':'2.', 'm':'5e-5', 'rt':1.0e-5, 'coll':'line', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
 
@@ -56,11 +63,16 @@ def main():
 	##Length of simulation and interval between snapshots
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
-	print pRun, pOut
+	rt=config.getfloat('params', 'rt')
+	coll=config.get('params', 'coll')
+
+	print pRun, pOut, rt
 	sections=config.sections()
 	sim = rebound.Simulation()
 	sim.G = 1.	
-	sim.add(m = 1) # BH
+	sim.add(m = 1, r=rt) # BH
+	sim.collision=coll
+	sim.collision_resolve=get_tde
 
 	##Add particles; Can have different sections with different types of particles (e.g. heavy and light)
 	##see the example config file in repository. Only require section is params which defines global parameters 
@@ -106,7 +118,7 @@ def main():
 
 	##Set up simulation archive for output
 	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
-	sim.heartbeat=heartbeat
+	#sim.heartbeat=heartbeat
 	sim.move_to_com()
 	print rebound.__version__
 	sim.integrate(pRun*2*np.pi)
