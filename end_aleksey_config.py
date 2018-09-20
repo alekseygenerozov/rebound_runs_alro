@@ -37,7 +37,7 @@ def get_tde(sim, reb_coll):
 	for idx,pp in enumerate(sim[0].particles[1:]):
 		dp=np.linalg.norm(np.array(sim[0].particles[0].xyz)-np.array(pp.xyz))
 		if dp<sim[0].particles[0].r:
-			print idx, 'TDE!'
+			print sim[0].t, pp.e, idx, 'TDE!'
 	return 0
 
 def main():
@@ -53,7 +53,7 @@ def main():
 
 	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',\
-		'a_min':'1.', 'a_max':'2.', 'm':'5e-5', 'rt':1.0e-5, 'coll':'line', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
+		'a_min':'1.', 'a_max':'2.', 'i_max':'5.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
 
@@ -84,14 +84,15 @@ def main():
 		m=config.getfloat(ss, 'm')
 		a_min=config.getfloat(ss, 'a_min')
 		a_max=config.getfloat(ss, 'a_max')
+		i_max=config.getfloat(ss, 'i_max')
 
 		M = np.zeros(N + 1)
 		for j in range(0, N + 1):
 			M[j] = rand.uniform(0, 2 * np.pi)
 
 		for l in range(0,N): # Adds stars
-			sim.add(m = m, a = density(a_min, a_max), e = e, inc=np.random.uniform(0, 5 * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
-		print N, m, e, a_min, a_max
+			sim.add(m = m, a = density(a_min, a_max), e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
+		print N, m, e, a_min, a_max, i_max
 
 	##Integrate forward a small amount time to initialize accelerations.
 	sim.move_to_com()
