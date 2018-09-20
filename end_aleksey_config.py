@@ -71,8 +71,7 @@ def main():
 	sim = rebound.Simulation()
 	sim.G = 1.	
 	sim.add(m = 1, r=rt) # BH
-	sim.collision=coll
-	sim.collision_resolve=get_tde
+
 
 	##Add particles; Can have different sections with different types of particles (e.g. heavy and light)
 	##see the example config file in repository. Only require section is params which defines global parameters 
@@ -116,6 +115,8 @@ def main():
 		sim.integrate(sim.t+sim.t*1.0e-14)
 		bins=bin_find_sim(sim)
 
+	sim.collision=coll
+	sim.collision_resolve=get_tde
 	##Set up simulation archive for output
 	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
 	#sim.heartbeat=heartbeat
