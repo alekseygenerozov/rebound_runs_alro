@@ -34,10 +34,11 @@ def heartbeat(sim):
 	# print(sim.contents.dt)
 
 def get_tde(sim, reb_coll):
-	for idx,pp in enumerate(sim[0].particles[1:]):
-		dp=np.linalg.norm(np.array(sim[0].particles[0].xyz)-np.array(pp.xyz))
-		if dp<sim[0].particles[0].r:
-			print sim[0].t, pp.e, idx, 'TDE!'
+	orbits = sim[0].calculate_orbits(primary=sim[0].particles[0])
+	p1,p2 = reb_coll.p1, reb_coll.p2
+	idx, idx0 = max(p1, p2), min(p1, p2)
+	if idx0==0:
+		print sim[0].t, orbits[idx].e, idx, 'TDE!'
 	return 0
 
 def main():
