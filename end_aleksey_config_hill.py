@@ -130,7 +130,7 @@ def main():
 		bins=bin_find_sim(sim)
 
 	sim.collision=coll
-	sim.collision_resolve=get_tde
+	sim.collision_resolve=get_hill
 	##Set up simulation archive for output
 	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
 	#sim.heartbeat=heartbeat
