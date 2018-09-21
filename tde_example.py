@@ -28,8 +28,8 @@ def get_tde(sim, reb_coll):
 	p1,p2 = reb_coll.p1, reb_coll.p2
 	idx, idx0 = max(p1, p2), min(p1, p2)
 	if idx0==0:
-		##idx incremented by 1 because there is no orbit 0
-		print sim[0].t, orbits[idx+1].e, idx, 'TDE!'
+		##idx decremented by 1 because there is no orbit 0
+		print sim[0].t, orbits[idx-1].e, idx, 'TDE!'
 
 	return 0
 
