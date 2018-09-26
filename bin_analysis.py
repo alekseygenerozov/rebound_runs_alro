@@ -268,10 +268,10 @@ class BinAnalysis(object):
 
 	def bin_times(self):
 		pairs=self.pairs
-		t_survs=np.zeros(len(np.unique(pairs)))
+		t_survs=np.zeros(len(pairs))
 		sa = rebound.SimulationArchive(self.sa_name)
 		##For each binary identify how long it survives
-		for ii,pp in enumerate(np.unique(pairs)):
+		for ii,pp in enumerate(pairs):
 			##Identify all times where each binary pair exists.
 			t_bin=self.times_arr[pairs==pp]
 			t_surv=t_bin[-1]-t_bin[0]
@@ -281,7 +281,7 @@ class BinAnalysis(object):
 
 			##Edge case: Binary splits up and forms again. See if the binary has skipped any snapshots.
 			##Note that snapshots may not be exactly evenly spaced in time...
-			diffs=np.diff([np.where(np.isclose(self.ts,t_bin[ii], atol=0., rtol=1.0e-12))[0][0] for ii in range(len(t_bin))])
+			diffs=np.diff([np.where(np.isclose(self.ts,t_bin[jj], atol=0., rtol=1.0e-12))[0][0] for jj in range(len(t_bin))])
 			if np.any(diffs>1.01):
 				tmp=np.split(t_bin, np.where(diffs>1.01)[0]+1)
 				tmp2=[tmp[i][-1]-tmp[i][0] for i in range(len(tmp))]
