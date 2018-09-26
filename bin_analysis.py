@@ -206,6 +206,7 @@ class BinAnalysis(object):
 		Getting properties of all of the binaries in a rebound simulation run.
 		'''
 		self.sa_name=sa_name
+		print sa_name
 		#sa=rebound.SimulationArchive(sa_name)
 		#self.m0=sa[0].particles[0].m
 		
@@ -266,6 +267,19 @@ class BinAnalysis(object):
 		num_bins=[len(self.times_arr[np.isclose(self.times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in self.ts]
 		return num_bins
 
+	def num_bins_filt(self):
+		'''
+		Count number of binaries but only include binaries that complete at 
+		least one orbit...
+		'''
+		times=self.bin_times()
+		filt=times>1.		
+		bins2=self.bins[filt]
+		times_arr=bins2[:,0]
+
+		num_bins=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in self.ts]
+		return num_bins
+
 	def bin_times(self):
 		pairs=self.pairs
 		t_survs=np.zeros(len(pairs))
@@ -281,7 +295,7 @@ class BinAnalysis(object):
 
 			##Edge case: Binary splits up and forms again. See if the binary has skipped any snapshots.
 			##Note that snapshots may not be exactly evenly spaced in time...
-			diffs=np.diff([np.where(np.isclose(self.ts,t_bin[jj], atol=0., rtol=1.0e-12))[0][0] for jj in range(len(t_bin))])
+			diffs=np.diff([np.where(np.abs(self.ts-t_bin[jj])/t_bin[jj]<1.0e-12)[0][0] for jj in range(len(t_bin))])
 			if np.any(diffs>1.01):
 				tmp=np.split(t_bin, np.where(diffs>1.01)[0]+1)
 				tmp2=[tmp[i][-1]-tmp[i][0] for i in range(len(tmp))]
@@ -290,8 +304,8 @@ class BinAnalysis(object):
 				t_surv=tmp2[order[-1]]
 
 			##Survival time of the binary normalized to the binary orbital period
-			sim=sa.getSimulation(t_bin[-1])
-			sim.move_to_com()
+			#sim=sa.getSimulation(t_bin[-1])
+			#sim.move_to_com()
 			#t_orb=sim.particles[idx].P
 			##Binary orbital period -- not this is not a constant--take the minimum orbital period 
 			m1=sa[0].particles[idx].m
@@ -299,6 +313,7 @@ class BinAnalysis(object):
 			t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
 			t_survs[ii]=t_surv/t_orb
 		return t_survs
+
 
 
 
