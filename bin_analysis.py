@@ -106,8 +106,8 @@ def bin_find(loc):
 		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(ps[i1], ps[i2])
 		m1,m2 =ps[i1].m, ps[i2].m
 		##Hill sphere condition.
-		inside_hill=(a_bin<((m1+m2)/m0)**(1./3.)*com_d)
-		tidal_2 = (m1*m2/d2>ft)
+		inside_hill=(a_bin<((m1+m2)/3./m0)**(1./3.)*com_d)
+		tidal_2 = (m1*m2/d2>1.56*ft)
 
 		##If the kinetic energy is less than the potential energy 
 		if ((a_bin>0) and (inside_hill) and (tidal_2)):
@@ -132,8 +132,8 @@ def bin_find_sim(sim):
 		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(ps[i1], ps[i2])
 		m1,m2 =ps[i1].m, ps[i2].m
 		##Hill sphere condition.
-		inside_hill=(a_bin<((m1+m2)/m0)**(1./3.)*com_d)
-		tidal_2 = (m1*m2/d2>ft)
+		inside_hill=(a_bin<((m1+m2)/3./m0)**(1./3.)*com_d)
+		tidal_2 = (m1*m2/d2>1.56*ft)
 
 		##If the kinetic energy is less than the potential energy 
 		if ((a_bin>0) and (inside_hill) and (tidal_2)):
@@ -280,8 +280,7 @@ class BinAnalysis(object):
 			idx2=self.pairs_arr[pairs==pp][0,0]
 
 			##Edge case: Binary splits up and forms again. See if the binary has skipped any snapshots.
-			##snapshots may not be exactly evenly spaced, so it is best to to use the to if the binary 
-			##has skipped any snapshots...
+			##Note that snapshots may not be exactly evenly spaced in time...
 			diffs=np.diff([np.where(np.isclose(self.ts,t_bin[ii], atol=0., rtol=1.0e-12))[0][0] for ii in range(len(t_bin))])
 			if np.any(diffs>1.01):
 				tmp=np.split(t_bin, np.where(diffs>1.01)[0]+1)
@@ -290,8 +289,7 @@ class BinAnalysis(object):
 				t_bin=tmp[order[-1]]
 				t_surv=tmp2[order[-1]]
 
-			##Survival time of the binary normalized to orbital period (of binary within disk)
-			##(we use the orbital period of one of the stars in the binary as a proxy). 
+			##Survival time of the binary normalized to the binary orbital period
 			sim=sa.getSimulation(t_bin[-1])
 			sim.move_to_com()
 			#t_orb=sim.particles[idx].P

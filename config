@@ -1,6 +1,6 @@
 [params]
-rt = 1.0e-5
-coll = line
 
 [stars]
-N=120
+N=225
+e=0.
+i_max = 0.2
