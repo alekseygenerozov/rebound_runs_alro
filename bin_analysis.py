@@ -248,7 +248,7 @@ class BinAnalysis(object):
 
 	def N_bin_analytic(self, ii, rh, omega):
 		vh=rh*omega
-		return (3./(4.*np.pi))*rh**2.*(vh/self.sigs(ii)[2])**4.
+		return ((4.*np.pi)/3.)*rh**2.*(vh/self.sigs(ii)[2])**4.
 
 	def exotica(self):
 		'''

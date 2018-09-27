@@ -1,12 +1,9 @@
 [params]
+pRun=20.
 
 [stars]
-N=225
+N=120
 e=0.
-i_max = 0.2
 
-[bhs]
-N=10
-m=5.0e-4
-e=0.
-i_max=0.2
+
+
