@@ -241,6 +241,15 @@ class BinAnalysis(object):
 		np.savetxt(self.sa_name.replace('.bin','_bins.csv'), self.bins,delimiter=',')
 
 
+	def sigs(self, ii):
+		sa = rebound.SimulationArchive(self.sa_name)
+		sigs = np.std([np.array(pp.vxyz) for pp in sa[ii].particles[1:]],axis=0)
+		return sigs
+
+	def N_bin_analytic(self, ii, rh, omega):
+		vh=rh*omega
+		return (3./(4.*np.pi))*rh**2.*(vh/self.sigs(ii)[2])**4.
+
 	def exotica(self):
 		'''
 		Identifying triples and exchange interactions.

@@ -34,10 +34,12 @@ def heartbeat(sim):
 	# print(sim.contents.dt)
 
 def get_hill(sim, reb_coll):
-	#orbits = sim[0].calculate_orbits(primary=sim[0].particles[0])
+	orbits = sim[0].calculate_orbits(primary=sim[0].particles[0])
 	p1,p2 = reb_coll.p1, reb_coll.p2
 	idx, idx0 = max(p1, p2), min(p1, p2)
-	print sim[0].t,sim[0].particles[idx].xyz, sim[0].particles[idx0].xyz, idx, idx0
+	vh=(sim[0].particles[idx].m/3.)**(1./3.)*orbits[idx-1].a**-0.5
+	v=np.linalg.norm(sim[0].particles[idx].vxyz-sim[0].particles[idx0].vxyz)
+	print sim[0].t,v,vh,v/vh
 
 	return 0
 
