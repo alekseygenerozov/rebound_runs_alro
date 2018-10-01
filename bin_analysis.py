@@ -222,7 +222,8 @@ class BinAnalysis(object):
 		self.pairs_arr=self.bins[:,[1,2]].astype(int)
 		self.times_arr=self.bins[:,0]
 		self.pairs=np.array([{int(self.bins[i,1]),int(self.bins[i,2])} for i in range(len(self.bins))])
-
+		tmp,idx=np.unique(self.pairs.astype(str), return_index=True)
+		self.pairs_u=self.pairs[idx]
 
 
 	def __bin_init__(self):
@@ -289,7 +290,7 @@ class BinAnalysis(object):
 		num_bins=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in self.ts]
 		return num_bins
 
-	def bin_times(self):
+	def bin_times(self, norm=True):
 		pairs=self.pairs
 		t_survs=np.zeros(len(pairs))
 		sa = rebound.SimulationArchive(self.sa_name)
@@ -320,9 +321,39 @@ class BinAnalysis(object):
 			m1=sa[0].particles[idx].m
 			m2=sa[0].particles[idx2].m
 			t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
-			t_survs[ii]=t_surv/t_orb
+			if norm:
+				t_surv=t_surv/t_orb
+			t_survs[ii]=t_surv
+
 		return t_survs
 
+	def bin_times_fast(self, norm=True):
+		pairs=self.pairs
+		pairs_u=self.pairs_u
+		t_survs=np.zeros(len(pairs_u))
+		sa = rebound.SimulationArchive(self.sa_name)
+		##For each binary identify how long it survives
+		for ii,pp in enumerate(pairs_u):
+			##Identify all times where each binary pair exists.
+			t_bin=self.times_arr[pairs==pp]
+			#Index of one of the stars in the pair
+			idx=self.pairs_arr[pairs==pp][0,1]
+			idx2=self.pairs_arr[pairs==pp][0,0]
+			##snapshots are more or less regularly spaced: interval between 
+			##snapshots typically does not vary by more than 5%.
+			indics=np.where(np.diff(t_bin)>1.5*(self.ts[1]-self.ts[0]))[0]+1
+			t_bin=np.split(t_bin, indics)
+			##Binary survival time (tak the longest segment)
+			t_surv=max([tt[-1]-tt[0] for tt in t_bin])
+			##Binary orbital period -- not this is not a constant--take the minimum orbital period 
+			m1=sa[0].particles[idx].m
+			m2=sa[0].particles[idx2].m
+			t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
+			if norm:
+				t_surv=t_surv/t_orb
+			t_survs[ii]=t_surv
+
+		return t_survs
 
 
 

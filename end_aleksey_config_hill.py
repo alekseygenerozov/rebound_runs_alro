@@ -37,9 +37,10 @@ def get_hill(sim, reb_coll):
 	orbits = sim[0].calculate_orbits(primary=sim[0].particles[0])
 	p1,p2 = reb_coll.p1, reb_coll.p2
 	idx, idx0 = max(p1, p2), min(p1, p2)
-	vh=(sim[0].particles[idx].m/3.)**(1./3.)*orbits[idx-1].a**-0.5
+	a, a1=orbits[idx-1].a, orbits[idx0-1].a
+	vh=(sim[0].particles[idx].m/3.)**(1./3.)*a**-0.5
 	v=np.linalg.norm(np.array(sim[0].particles[idx].vxyz)-np.array(sim[0].particles[idx0].vxyz))
-	print sim[0].t,v,vh,v/vh
+	print sim[0].t,v,vh,a,a1,v/vh
 
 	return 0
 
@@ -106,7 +107,7 @@ def main():
 
 		for l in range(0,N): # Adds stars
 			aa=density(a_min, a_max)
-			sim.add(m = m, a = aa, r=(m/3.)**(1./3.)*aa, e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
+			sim.add(m = m, a = aa, r=0.5*(m/3.)**(1./3.)*aa, e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
 		print N, m, e, a_min, a_max, i_max
 
 	##Integrate forward a small amount time to initialize accelerations.
