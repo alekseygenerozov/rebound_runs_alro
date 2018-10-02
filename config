@@ -1,10 +1,9 @@
 [params]
-pRun=20.
 
 [stars]
-N=110
+N=205
 e=0.
-m=5.0e-5
+m=1.0e-5
 
 
 
