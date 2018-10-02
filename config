@@ -1,9 +1,13 @@
 [params]
 
 [stars]
-N=205
+N=240
 e=0.
-m=1.0e-5
+i_max=5.
 
-
+[bhs]
+m=5.0e-4
+N=32
+e=0.
+i_max=5.
 

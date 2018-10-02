@@ -55,7 +55,6 @@ num_bins_analytic=[]
 names=np.genfromtxt(base+'/names', dtype=str)
 ##Iterating over all runs
 for ii,name in enumerate(names):
-	idx=np.where(np.genfromtxt(base+name.replace('.bin', '_masses'))>mheavy)[0][0]+1
 	bins=bin_analysis.BinAnalysis(base+name)
 	nums=bins.num_bins()
 
