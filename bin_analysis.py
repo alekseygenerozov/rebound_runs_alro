@@ -265,7 +265,7 @@ class BinAnalysis(object):
 
 				if len(tmp)>1:
 					print "star {0}, {1} bound stars!, tt={2}".format(ns, len(tmp)+1, tt/(2.*np.pi))
-				elif (len(tmp)==1) and (len(last)==1) and (list(tmp)!=list(last)) and (tt-tlast<1.01*self.delta_t):
+				elif (len(tmp)==1) and (len(last)==1) and (list(tmp)!=list(last)) and (tt-tlast<1.5*self.delta_t):
 					print "star {0}, exchange!, tt={1}, {2}->{3}, {4}".format(ns, tt/(2.*np.pi), last, tmp, (tt-tlast)/self.delta_t)
 				last=np.copy(tmp)
 				tlast=tt
