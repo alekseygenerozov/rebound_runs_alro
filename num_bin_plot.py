@@ -32,6 +32,7 @@ parser.add_argument('-y', '--ymax', type=float, default=20., help='Maximum y for
 parser.add_argument('-t', '--tmax', type=float, default=20., help='Maximum time for plot')
 parser.add_argument('-c1', '--col1', default='black', help='Color for simulation results')
 parser.add_argument('-c2', '--col2', default='red', help='Color for analytic prediction')
+parser.add_argument('-na', '--nanalyt', dest='analyt',  action='store_false', help='Flag indicating whether to plot analytic solution')
 
 args=parser.parse_args()
 
@@ -41,6 +42,9 @@ tmax=args.tmax
 ymax=args.ymax
 col1=args.col1
 col2=args.col2
+print args.analyt
+analyt=args.analyt
+
 
 fig,ax=plt.subplots(figsize=(10,9))
 ax.set_xlabel('Time [Orbits]')
@@ -72,6 +76,7 @@ for ii,name in enumerate(names):
 	num_bins.append(nums)
 	num_bins_analytic.append(nums_analytic)
 
+print len(num_bins)
 
 ##Median number of binaries and standard deviation as a function of time 
 nums_med=np.median(num_bins, axis=0)
@@ -84,9 +89,10 @@ ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax),
 ##Analytic prediction
 nums_med_analytic=np.median(num_bins_analytic, axis=0)
 err=np.std(num_bins_analytic, axis=0)
-ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
-			 color=col2, alpha=0.3)
-ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
+if analyt:
+	ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
+				 color=col2, alpha=0.3)
+	ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
 
 ax.legend()
 fig.savefig(base+'/num_bins.pdf', transparent=True)

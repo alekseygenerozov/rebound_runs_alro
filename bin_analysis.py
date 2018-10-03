@@ -112,11 +112,13 @@ def bin_find(loc):
 		##If the kinetic energy is less than the potential energy 
 		if ((a_bin>0) and (inside_hill) and (tidal_2)):
 		#if ((a_bin>0) and (inside_hill)):
-			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin])
+			rh=(((m1+m2)/m0)**(1./3.)*com_d)
+			vh=rh*(m0/com_d**3.)**0.5
+			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin, rh, vh])
 
-	return np.array(bin_indics)
+	return Table(bin_indics, names=['t', 'i1', 'i2', 'bin_sep', 'a_bin', 'a_bin/r_h', 'e_bin', 'rh', 'vh'])
 
-
+ 
 def bin_find_sim(sim):
 	##Ensure we are in the com frame of the simulation.
 	sim.move_to_com()
@@ -137,9 +139,11 @@ def bin_find_sim(sim):
 
 		##If the kinetic energy is less than the potential energy 
 		if ((a_bin>0) and (inside_hill) and (tidal_2)):
-			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin])
+			rh=(((m1+m2)/m0)**(1./3.)*com_d)
+			vh=rh*(m0/com_d**3.)**0.5
+			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin, rh, vh])
 
-	return np.array(bin_indics)
+	return Table(bin_indics, names=['t', 'i1', 'i2', 'bin_sep', 'a_bin', 'a_bin/r_h', 'e_bin', 'rh', 'vh'])
 
 def p_dist(loc, idx):
 	t,name=loc
