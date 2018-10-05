@@ -116,7 +116,8 @@ def bin_find(loc):
 			vh=rh*(m0/com_d**3.)**0.5
 			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin, rh, vh])
 
-	return Table(bin_indics, names=['t', 'i1', 'i2', 'bin_sep', 'a_bin', 'a_bin/r_h', 'e_bin', 'rh', 'vh'])
+	return np.array(bin_indics)
+	#return Table(bin_indics, names=['t', 'i1', 'i2', 'bin_sep', 'a_bin', 'a_bin/r_h', 'e_bin', 'rh', 'vh'])
 
  
 def bin_find_sim(sim):
@@ -143,7 +144,8 @@ def bin_find_sim(sim):
 			vh=rh*(m0/com_d**3.)**0.5
 			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin, rh, vh])
 
-	return Table(bin_indics, names=['t', 'i1', 'i2', 'bin_sep', 'a_bin', 'a_bin/r_h', 'e_bin', 'rh', 'vh'])
+	return np.array(bin_indics)
+	#return Table(bin_indics, names=['t', 'i1', 'i2', 'bin_sep', 'a_bin', 'a_bin/r_h', 'e_bin', 'rh', 'vh'])
 
 def p_dist(loc, idx):
 	t,name=loc

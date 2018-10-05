@@ -104,7 +104,7 @@ def main():
 	bins=bin_find_sim(sim)
 
 	bins=np.array(bins)
-	# print bins[:,[1,2]].astype(int)
+	print bins[:,[1,2]].astype(int)
 	##Delete all the binaries that we found. The identification of binaries depends in part on the tidal field 
 	##of the star cluster, and this will change as we delete stars. So we repeat the binary 
 	##deletion process several times until there are none left.
@@ -118,8 +118,6 @@ def main():
 
 	ms=np.array([pp.m for pp in sim.particles])
 	print len(ms[ms>1.0e-4])
-	print len(ms[ms<1.0e-4])
-
 	sim.collision=coll
 	sim.collision_resolve=get_tde
 	##Set up simulation archive for output
