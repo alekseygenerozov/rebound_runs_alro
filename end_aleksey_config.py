@@ -117,7 +117,7 @@ def main():
 		bins=bin_find_sim(sim)
 
 	ms=np.array([pp.m for pp in sim.particles])
-	print len(ms[ms>1.0e-4])
+	print len(ms[ms>1.0e-4]), len(ms)
 	sim.collision=coll
 	sim.collision_resolve=get_tde
 	##Set up simulation archive for output
