@@ -62,7 +62,7 @@ for ii,name in enumerate(names):
 	idx=np.where(np.genfromtxt(base+name.replace('.bin', '_masses'))>mheavy)[0][0]+1
 	bins=bin_analysis.BinAnalysis(base+name)
 	bins_tab=bins.bins
-	bins_tab_light=bins_tab[(bins_tab[:,1]<idx)|(bins_tab[:,2]<idx)]
+	bins_tab_light=bins_tab[(bins_tab[:,1]<idx) & (bins_tab[:,2]<idx)]
 
 	times_arr=bins_tab_light[:,0]
 	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in bins.ts]

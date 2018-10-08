@@ -102,9 +102,8 @@ def main():
 	sim.integrate(1.0e-15)
 	##Look for binaries
 	bins=bin_find_sim(sim)
-
 	bins=np.array(bins)
-	print bins[:,[1,2]].astype(int)
+	print len(bins[:,[1,2]])
 	##Delete all the binaries that we found. The identification of binaries depends in part on the tidal field 
 	##of the star cluster, and this will change as we delete stars. So we repeat the binary 
 	##deletion process several times until there are none left.
