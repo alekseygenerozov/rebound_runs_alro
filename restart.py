@@ -21,6 +21,5 @@ def get_tde(sim, reb_coll):
 
 sim = rebound.Simulation.from_archive(sys.argv[1])
 sim.automateSimulationArchive(sys.argv[1],interval=np.pi*0.2,deletefile=False)
-sim.heartbeat=heartbeat
 sim.collision_resolve=get_tde
 sim.integrate(500*2*np.pi)
