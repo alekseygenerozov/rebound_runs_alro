@@ -27,14 +27,14 @@ def num_analytic(num, v, m=5.0e-5):
 
 parser=argparse.ArgumentParser(description='Plot number of binaries after a rebound run')
 parser.add_argument('-b', '--base', help='Location of sim data')
-parser.add_argument('-m', '--mass', type=float, help='Mass of each star')
+parser.add_argument('-m', '--mass', type=float, help='Mass of each star (only used for analytic comparison)')
 parser.add_argument('-y', '--ymax', type=float, default=20., help='Maximum y for plot')
 parser.add_argument('-t', '--tmax', type=float, default=20., help='Maximum time for plot')
 parser.add_argument('-c1', '--col1', default='black', help='Color for simulation results')
 parser.add_argument('-c2', '--col2', default='red', help='Color for analytic prediction')
 parser.add_argument('-c3', '--col3', default='green', help='Color for analytic prediction')
 parser.add_argument('-mh', '--mheavy', default=1.0e-4, help='Mass separating heavies from the light')
-
+parser.add_argument('-e', '--ext', default='png', help='extension for image file')
 
 args=parser.parse_args()
 
@@ -45,6 +45,7 @@ ymax=args.ymax
 col1=args.col1
 col2=args.col2
 col3=args.col3
+ext=args.ext
 mheavy=args.mheavy
 
 fig,ax=plt.subplots(figsize=(10,9))
@@ -99,4 +100,4 @@ ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax),
 
 
 ax.legend()
-fig.savefig(base+'/num_bins_heavy.pdf', transparent=True)
+fig.savefig(base+'/num_bins_heavy.'+ext, transparent=True)

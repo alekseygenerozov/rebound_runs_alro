@@ -94,8 +94,10 @@ def main():
 			M[j] = rand.uniform(0, 2 * np.pi)
 
 		for l in range(0,N): # Adds stars
-			sim.add(m = m, a = density(a_min, a_max), e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
-		print N, m, e, a_min, a_max, i_max
+			a0=density(a_min, a_max)
+			sim.add(m = m, a = a0, e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
+			print m, a0
+		#print N, m, e, a_min, a_max, i_max
 
 	##Integrate forward a small amount time to initialize accelerations.
 	sim.move_to_com()
@@ -103,7 +105,7 @@ def main():
 	##Look for binaries
 	bins=bin_find_sim(sim)
 	bins=np.array(bins)
-	print len(bins[:,[1,2]])
+	#print len(bins[:,[1,2]])
 	##Delete all the binaries that we found. The identification of binaries depends in part on the tidal field 
 	##of the star cluster, and this will change as we delete stars. So we repeat the binary 
 	##deletion process several times until there are none left.

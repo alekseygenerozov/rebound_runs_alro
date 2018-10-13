@@ -18,6 +18,32 @@ def get_com(ps):
 	return com/ms
 
 
+def orb_plane_proj(p1, p2, p3):
+	'''
+	Project p3 into orbital plane of p1 and p2
+	'''
+	##Vector going from p2 to p1
+	dp = p1 - p2  
+	##Unit vector going from p2 to p1
+	rhat = np.array(dp.xyz)/np.linalg.norm(dp.xyz)
+	v2 = p2.vxyz
+	vhat2 = v2/np.linalg.norm(v2)
+	norm2=np.cross(rhat, vhat2)
+	##Unit vector perpendicular to the orbital plane of p1 and p2
+	norm2=norm2/np.linalg.norm(norm2)
+
+	pos=np.array(p3.xyz)
+	##Projection of p3's position to the orbital plane
+	pos=pos-np.dot(pos, norm2)*norm2
+
+	##x-component; note that xhat point from particle 1 to particle 2.
+	x=-np.dot(pos, rhat)
+	##Define y using normal to plan and rhat
+	yhat=np.cross(norm2, -rhat)
+	y=np.dot(pos, yhat)
+	return x,y
+
+
 def bin_props(p1, p2):
 	'''
 	Auxiliary function to get binary properties for two particles. 
@@ -206,13 +232,113 @@ def com_plot(sa_name, i1, i2, extras=[], name='', cols=['r', 'g', 'k'], idx_min=
 		fig.savefig(sa_name.replace('.bin', '')+name+'_com_{0:03d}.png'.format(ii), bbox_inches='tight', pad_inches=0)
 		ann.remove()
 
+
+def lag_simple_plot(sa_name, i1, i2, extras=[], name='', cols=['r', 'g', 'k'], idx_min=0, idx_max=None, lim=0.1, ms=2, interval=1):
+	'''
+	Project particles to co-rotating frame ; this is function is only accurate if the orbital plane is the xy plane.
+	'''
+
+	planes = [['x', 'y'], ['x', 'z'], ['y','z']]
+	#fig.patch.set_visible(False)
+
+
+	sa = rebound.SimulationArchive(sa_name)
+	if not idx_max:
+		idx_max=len(sa)
+	m0=sa[0].particles[0].m
+	for ii in range(idx_min, idx_max, interval):
+		fig,ax=plt.subplots(nrows=1, ncols=3, figsize=(10*len(planes),10))
+		for kk, plane in enumerate(planes):
+			ax[kk].set_xlim(-lim,  lim)
+			ax[kk].set_ylim(-lim, lim)
+			ax[kk].set_xlabel(planes[kk][0])
+			ax[kk].set_ylabel(planes[kk][1])
+
+			sim=sa[ii]
+			p1,p2=sim.particles[i1],sim.particles[i2]
+			m1,m2=p1.m,p2.m
+			com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(p1,p2)
+			theta=-np.arctan2(p2_com.y,p2_com.x)
+			ct,st=np.cos(theta), np.sin(theta)
+			p1_xyz=np.dot([[ct, -st,0], [st, ct,0], [0,0,1]], p1_com.xyz)
+			p2_xyz=np.dot([[ct, -st,0], [st, ct,0], [0,0,1]], p2_com.xyz)
+			p1_xyz={'x':p1_xyz[0], 'y':p1_xyz[1], 'z':p1_xyz[2]}
+			p2_xyz={'x':p2_xyz[0], 'y':p2_xyz[1], 'z':p2_xyz[2]}
+
+
+			p1_pos=p1_xyz[plane[0]], p1_xyz[plane[1]]
+			p2_pos=p2_xyz[plane[0]], p2_xyz[plane[1]]
+			com=get_com([p1, p2])
+
+			ax[kk].plot(p1_pos[0], p1_pos[1], 'o', markersize=ms, color=cols[0])
+			ax[kk].plot(p2_pos[0], p2_pos[1], 'o', markersize=ms, color=cols[1])
+			for jj, extra in enumerate(extras):
+				xyz=np.dot([[ct, -st,0], [st, ct,0], [0,0,1]], (sim.particles[extra]-com).xyz)
+				xyz={'x':xyz[0], 'y':xyz[1], 'z':xyz[2]}
+				ax[kk].plot(xyz[plane[0]], xyz[plane[1]], 'o', markersize=ms, color=cols[(2+jj)%len(cols)])
+
+		alpha=m2/(m1+m2)
+		l1=(d2**0.5*(1.-(alpha/3.)**(1./3.)))
+		l2=(d2**0.5*(1.+(alpha/3.)**(1./3.)))
+		l3=(-d2**0.5*(1.+5./12.*alpha))
+		ax[0].plot(l1, 0, 'gv')
+		ax[0].plot(l2, 0, 'gv')
+		ax[0].plot(l3, 0, 'gv')
+		ax[0].plot(d2**0.5*np.cos(np.pi/3.), d2**0.5*np.sin(np.pi/3.), 'gv')
+		ax[0].plot(d2**0.5*np.cos(np.pi/3.), -d2**0.5*np.sin(np.pi/3.), 'gv')
+
+		fig.savefig(sa_name.replace('.bin', '')+name+'_com_{0:03d}.png'.format(ii), bbox_inches='tight', pad_inches=0)
+		plt.clf()
+		#ann.remove()
+
+
+
+def lag_plot(sa_name, i1, i2, extras=[], name='',  idx_min=0, idx_max=None, lim=0.1, ms=2, interval=1):
+	'''
+	Project particles to co-rotating frame only accurate if the orbital plane is the xy plane.
+	'''
+	sa = rebound.SimulationArchive(sa_name)
+	if not idx_max:
+		idx_max=len(sa)
+	m0=sa[0].particles[0].m
+	for ii in range(idx_min, idx_max, interval):
+		fig,ax=plt.subplots(figsize=(10,10))
+		ax.set_ylim(-lim, lim)
+		ax.set_xlim(-lim, lim)
+
+		sim=sa[ii]
+		p1,p2=sim.particles[i1],sim.particles[i2]
+		m1,m2=p1.m,p2.m
+		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(p1,p2)
+		x1,x2=np.linalg.norm(p1_com.xyz), np.linalg.norm(p2_com.xyz)
+		ax.plot(x2, 0, 'ko', markersize=ms)
+		ax.plot(-x1, 0, 'ko', markersize=ms)
+		for jj, extra in enumerate(extras):
+			p3=sim.particles[extra]
+			x,y=orb_plane_proj(p1, p2, p3)
+			ax.plot(x,y, 'ro', markersize=ms)
+		##Plotting Lagrange points
+		alpha=m2/(m1+m2)
+		l1=(d2**0.5*(1.-(alpha/3.)**(1./3.)))
+		l2=(d2**0.5*(1.+(alpha/3.)**(1./3.)))
+		l3=(-d2**0.5*(1.+5./12.*alpha))
+		ax.plot(l1, 0, 'gv')
+		ax.plot(l2, 0, 'gv')
+		ax.plot(l3, 0, 'gv')
+		ax.plot(d2**0.5*np.cos(np.pi/3.), d2**0.5*np.sin(np.pi/3.), 'gv')
+		ax.plot(d2**0.5*np.cos(np.pi/3.), -d2**0.5*np.sin(np.pi/3.), 'gv')
+
+		fig.savefig(sa_name.replace('.bin', '')+name+'_lag_{0:03d}.png'.format(ii), bbox_inches='tight', pad_inches=0)
+		plt.clf()
+
+		
+
 class BinAnalysis(object):
 	def __init__(self, sa_name):
 		'''
 		Getting properties of all of the binaries in a rebound simulation run.
 		'''
 		self.sa_name=sa_name
-		print sa_name
 		#sa=rebound.SimulationArchive(sa_name)
 		#self.m0=sa[0].particles[0].m
 		
@@ -349,7 +475,7 @@ class BinAnalysis(object):
 			##snapshots typically does not vary by more than 5%.
 			indics=np.where(np.diff(t_bin)>1.5*(self.ts[1]-self.ts[0]))[0]+1
 			t_bin=np.split(t_bin, indics)
-			##Binary survival time (tak the longest segment)
+			##Binary survival time (take the longest segment)
 			t_surv=max([tt[-1]-tt[0] for tt in t_bin])
 			##Binary orbital period -- not this is not a constant--take the minimum orbital period 
 			m1=sa[0].particles[idx].m

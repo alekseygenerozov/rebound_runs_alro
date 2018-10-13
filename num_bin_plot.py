@@ -27,12 +27,14 @@ def num_analytic(num, v, m=5.0e-5):
 
 parser=argparse.ArgumentParser(description='Plot number of binaries after a rebound run')
 parser.add_argument('-b', '--base', help='Location of sim data')
-parser.add_argument('-m', '--mass', type=float, help='Mass of each star')
+parser.add_argument('-m', '--mass', type=float, help='Mass of each star (only used for analytic comparison)')
 parser.add_argument('-y', '--ymax', type=float, default=20., help='Maximum y for plot')
 parser.add_argument('-t', '--tmax', type=float, default=20., help='Maximum time for plot')
 parser.add_argument('-c1', '--col1', default='black', help='Color for simulation results')
 parser.add_argument('-c2', '--col2', default='red', help='Color for analytic prediction')
 parser.add_argument('-na', '--nanalyt', dest='analyt',  action='store_false', help='Flag indicating whether to plot analytic solution')
+parser.add_argument('-e', '--ext', default='png', help='extension for image file')
+
 
 args=parser.parse_args()
 
@@ -42,6 +44,7 @@ tmax=args.tmax
 ymax=args.ymax
 col1=args.col1
 col2=args.col2
+ext=args.ext
 print args.analyt
 analyt=args.analyt
 
@@ -95,4 +98,4 @@ if analyt:
 	ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
 
 ax.legend()
-fig.savefig(base+'/num_bins.pdf', transparent=True)
+fig.savefig(base+'/num_bins.'+ext, transparent=False)
