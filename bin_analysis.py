@@ -33,8 +33,10 @@ def orb_plane_proj(p1, p2, p3):
 	norm2=norm2/np.linalg.norm(norm2)
 
 	pos=np.array(p3.xyz)
+	print np.linalg.norm(p3.xyz), p3.xyz, norm2
 	##Projection of p3's position to the orbital plane
-	pos=pos-np.dot(pos, norm2)*norm2
+	# pos=pos-np.dot(pos, norm2)*norm2
+	# print np.linalg.norm(p3.xyz)
 
 	##x-component; note that xhat point from particle 1 to particle 2.
 	x=-np.dot(pos, rhat)
@@ -293,7 +295,7 @@ def lag_simple_plot(sa_name, i1, i2, extras=[], name='', cols=['r', 'g', 'k'], i
 
 
 
-def lag_plot(sa_name, i1, i2, extras=[], name='',  idx_min=0, idx_max=None, lim=0.1, ms=2, interval=1):
+def lag_plot(sa_name, i1, i2, extras=[], name='',  idx_min=0, idx_max=None, lim=0.1, ms=2, interval=1, cols=['r']):
 	'''
 	Project particles to co-rotating frame only accurate if the orbital plane is the xy plane.
 	'''
@@ -316,7 +318,7 @@ def lag_plot(sa_name, i1, i2, extras=[], name='',  idx_min=0, idx_max=None, lim=
 		for jj, extra in enumerate(extras):
 			p3=sim.particles[extra]
 			x,y=orb_plane_proj(p1, p2, p3)
-			ax.plot(x,y, 'ro', markersize=ms)
+			ax.plot(x,y, 'o', color=cols[jj%len(cols)], markersize=ms)
 		##Plotting Lagrange points
 		alpha=m2/(m1+m2)
 		l1=(d2**0.5*(1.-(alpha/3.)**(1./3.)))
@@ -463,7 +465,6 @@ class BinAnalysis(object):
 		pairs=self.pairs
 		pairs_u=self.pairs_u
 		t_survs=np.zeros(len(pairs_u))
-		sa = rebound.SimulationArchive(self.sa_name)
 		##For each binary identify how long it survives
 		for ii,pp in enumerate(pairs_u):
 			##Identify all times where each binary pair exists.
@@ -478,10 +479,11 @@ class BinAnalysis(object):
 			##Binary survival time (take the longest segment)
 			t_surv=max([tt[-1]-tt[0] for tt in t_bin])
 			##Binary orbital period -- not this is not a constant--take the minimum orbital period 
-			m1=sa[0].particles[idx].m
-			m2=sa[0].particles[idx2].m
-			t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
 			if norm:
+				sa = rebound.SimulationArchive(self.sa_name)
+				m1=sa[0].particles[idx].m
+				m2=sa[0].particles[idx2].m
+				t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
 				t_surv=t_surv/t_orb
 			t_survs[ii]=t_surv
 
