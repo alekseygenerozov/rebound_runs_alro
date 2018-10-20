@@ -5,7 +5,7 @@ import numpy as np
 name=sys.argv[1]
 print name
 sa=rebound.SimulationArchive(name)
-ms=np.genfromtxt(name.replace('.bin', '_masses'))
+ms=np.array([pp.m for pp in sa[0].particles[1:]])
 
 sigs_light=np.empty([len(sa), 3])
 sigs_heavy=np.empty([len(sa), 3])

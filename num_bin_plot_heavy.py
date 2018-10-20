@@ -34,6 +34,7 @@ parser.add_argument('-c1', '--col1', default='black', help='Color for simulation
 parser.add_argument('-c2', '--col2', default='red', help='Color for analytic prediction')
 parser.add_argument('-c3', '--col3', default='green', help='Color for analytic prediction')
 parser.add_argument('-mh', '--mheavy', default=1.0e-4, help='Mass separating heavies from the light')
+parser.add_argument('-na', '--nanalyt', dest='analyt',  action='store_false', help='Flag indicating whether to plot analytic solution')
 parser.add_argument('-e', '--ext', default='png', help='extension for image file')
 
 args=parser.parse_args()
@@ -46,6 +47,7 @@ col1=args.col1
 col2=args.col2
 col3=args.col3
 ext=args.ext
+analyt=args.analyt
 mheavy=args.mheavy
 
 fig,ax=plt.subplots(figsize=(10,9))
@@ -82,12 +84,13 @@ for ii,name in enumerate(names):
 	num_bins_analytic.append(nums_analytic)
 
 
-##Analytic prediction
-# nums_med_analytic=np.median(num_bins_analytic, axis=0)
-# err=np.std(num_bins_analytic, axis=0)
-# ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
-# 			 color=col2, alpha=0.3)
-# ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
+#Analytic prediction
+nums_med_analytic=np.median(num_bins_analytic, axis=0)
+err=np.std(num_bins_analytic, axis=0)
+if analyt:
+	ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
+				 color=col2, alpha=0.3)
+	ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
 
 
 ##Median number of binaries and standard deviation as a function of time 

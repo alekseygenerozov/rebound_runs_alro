@@ -1,10 +1,10 @@
 [params]
-pRun=0.3
 
 [stars]
-N=200
+N=215
 e=0.
 
-
-
-
+[bhs]
+N=3
+e=0.
+m=5.0e-4
