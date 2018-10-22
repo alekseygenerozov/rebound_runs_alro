@@ -489,6 +489,9 @@ class BinAnalysis(object):
 
 		return t_survs
 
+	def bin_pairs_sort(self):
+		return self.pairs_u[np.argsort(self.bin_times_fast(norm=False))]
+
 
 
 
