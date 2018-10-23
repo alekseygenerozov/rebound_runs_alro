@@ -7,7 +7,7 @@ name=sys.argv[1]
 print name
 sa=rebound.SimulationArchive(name)
 
-elem_names=['a', 'e', 'inc', 'omega']
+elem_names=['a', 'e', 'inc', 'omega', 'theta']
 #elem_names=['a', 'e']
 sim=sa[0]
 nn=len(sim.particles)

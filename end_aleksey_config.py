@@ -48,14 +48,21 @@ def main():
 		description='Set up a rebound run')
 	parser.add_argument('--config', nargs=1, default='config',
 		help='File containing simulation parameters')
+	parser.add_argument('--keep_bins', action='store_true',
+		help="Don't delete bins from simulation")
+
 
 	args=parser.parse_args()
 	config_file=args.config
+	keep_bins=args.keep_bins
+	print keep_bins
+
 	print config_file
 	tag=str(uuid.uuid4())
 
 	##Default stellar parameters 
-	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',\
+	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
+		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
 		'a_min':'1.', 'a_max':'2.', 'i_max':'5.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
@@ -74,7 +81,11 @@ def main():
 	sim = rebound.Simulation()
 	sim.G = 1.	
 	sim.add(m = 1, r=rt) # BH
-
+	sim.gravity=config.get('params', 'gravity')
+	sim.integrator=config.get('params', 'integrator')
+	dt=config.getfloat('params', 'dt')
+	if dt:
+		sim.dt=dt
 
 	##Add particles; Can have different sections with different types of particles (e.g. heavy and light)
 	##see the example config file in repository. Only require section is params which defines global parameters 
@@ -99,34 +110,45 @@ def main():
 			print m, a0
 		#print N, m, e, a_min, a_max, i_max
 
-	##Integrate forward a small amount time to initialize accelerations.
-	sim.move_to_com()
-	sim.integrate(1.0e-15)
-	##Look for binaries
-	bins=bin_find_sim(sim)
-	bins=np.array(bins)
-	#print len(bins[:,[1,2]])
-	##Delete all the binaries that we found. The identification of binaries depends in part on the tidal field 
-	##of the star cluster, and this will change as we delete stars. So we repeat the binary 
-	##deletion process several times until there are none left.
-	while len(bins>0):
-		##Delete in reverse order (else the indices would become messed up)
-		to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
-		for idx in to_del:
-			sim.remove(idx)
-		sim.integrate(sim.t+sim.t*1.0e-14)
+	fen=open(name.replace('.bin', '_en'), 'a')
+	fen.write(sim.gravity+'_'+sim.integrator+'_'+'{0}'.format(sim.dt))
+	if not keep_bins:
+		##Integrate forward a small amount time to initialize accelerations.
+		sim.move_to_com()
+		sim.integrate(1.0e-15)
+		##Look for binaries
 		bins=bin_find_sim(sim)
+		bins=np.array(bins)
+		#print len(bins[:,[1,2]])
+		##Delete all the binaries that we found. The identification of binaries depends in part on the tidal field 
+		##of the star cluster, and this will change as we delete stars. So we repeat the binary 
+		##deletion process several times until there are none left.
+		while len(bins>0):
+			##Delete in reverse order (else the indices would become messed up)
+			to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
+			for idx in to_del:
+				sim.remove(idx)
+			sim.integrate(sim.t+sim.t*1.0e-14)
+			bins=bin_find_sim(sim)
 
 	ms=np.array([pp.m for pp in sim.particles])
 	print len(ms[ms>1.0e-4]), len(ms)
 	sim.collision=coll
 	sim.collision_resolve=get_tde
+
 	##Set up simulation archive for output
 	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
 	#sim.heartbeat=heartbeat
 	sim.move_to_com()
+
+	en=sim.calculate_energy()
 	print rebound.__version__
 	sim.integrate(pRun*2*np.pi)
+	en2=sim.calculate_energy()
+	print abs(en2-en)/en
+	fen.write('_{0:2.3g}'.format(abs(en2-en)/en))
+	fen.close()
+
 
 
 
