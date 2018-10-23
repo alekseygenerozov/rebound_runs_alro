@@ -1,6 +1,6 @@
 [params]
 pRun = 1.0e-8
-gravity = basic
+gravity = tree
 
 [stars]
 N=110

@@ -86,6 +86,9 @@ def main():
 	dt=config.getfloat('params', 'dt')
 	if dt:
 		sim.dt=dt
+	if sim.gravity=='tree':
+		sim.configure_box(10.)
+		sim.boundary='open'
 
 	##Add particles; Can have different sections with different types of particles (e.g. heavy and light)
 	##see the example config file in repository. Only require section is params which defines global parameters 
