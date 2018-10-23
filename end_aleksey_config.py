@@ -87,8 +87,10 @@ def main():
 	if dt:
 		sim.dt=dt
 	if sim.gravity=='tree':
+		##Fixing box, angle, and boundary parameters in the tree code.
 		sim.configure_box(10.)
 		sim.boundary='open'
+		sim.opening_angle2=1.5
 
 	##Add particles; Can have different sections with different types of particles (e.g. heavy and light)
 	##see the example config file in repository. Only require section is params which defines global parameters 
