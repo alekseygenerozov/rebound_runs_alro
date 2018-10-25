@@ -1,9 +1,12 @@
 [params]
-pRun = 1.0e-8
-gravity = tree
 
 [stars]
-N=110
-e=0.7
+N=220
+e=0.
+
+[bhs]
+N = 1
+m = 5.0e-3
+e = 0.
 
 
