@@ -343,7 +343,8 @@ class BinAnalysis(object):
 		self.sa_name=sa_name
 		#sa=rebound.SimulationArchive(sa_name)
 		#self.m0=sa[0].particles[0].m
-		
+		self.tords=np.arange(0., 500.1*2.*np.pi, 0.2*np.pi)
+		self.tords[0]=2.0e-15
 		try:
 			self.ts= np.genfromtxt(sa_name.replace('.bin', '_times'))
 			self.bins=np.genfromtxt(sa_name.replace('.bin','_bins.csv'), delimiter=',')
@@ -362,7 +363,8 @@ class BinAnalysis(object):
 
 	def __bin_init__(self):
 		sa = rebound.SimulationArchive(self.sa_name)
-		self.ts=[sim.t for sim in sa] 
+		sims= sa.getSimulations(self.tords)
+		self.ts=[sim.t for sim in sims] 
 		np.savetxt(self.sa_name.replace('.bin', '_times'), self.ts)
 		locs = [[tt, self.sa_name] for tt in self.ts]
 		#pool = rebound.InterruptiblePool(processes=3)
