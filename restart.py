@@ -25,4 +25,4 @@ if sim.t>=499*2*np.pi:
 	sys.exit(0)
 sim.simulationarchive_next=sim.t+0.2*np.pi	
 sim.collision_resolve=get_tde
-sim.integrate(0.2*np.pi)
+sim.integrate(500*2*np.pi)
