@@ -26,6 +26,10 @@ def density(min1, max1):
 #     r=np.random.random(1)[0]
 #     return (1./min1-r*(1./min1-1./max1))**-1.
 
+def dens_correct(min1, max1):
+	r=np.random.random(1)[0]
+	return min1*np.exp(r*np.log(max1/min1))
+
 def heartbeat(sim):
 	print(sim.contents.dt, sim.contents.t)
 # sim is a pointer to the simulation object,
