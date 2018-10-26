@@ -43,7 +43,10 @@ def get_tde(sim, reb_coll):
 	idx, idx0 = max(p1, p2), min(p1, p2)
 	if idx0==0:
 		##idx decremented by 1 because there is no orbit 0
-		print sim[0].t, orbits[idx-1].e, idx, 'TDE!'
+		name=sim[0].simulationarchive_filename
+		f=open(name.replace('.bin', '_tde'), 'a+')
+		f.write('{0} {1} {2} {3} TDE!\n'.format(sim[0].t, orbits[idx-1].a, orbits[idx-1].e, idx))
+		f.close()
 
 	return 0
 
