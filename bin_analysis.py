@@ -365,7 +365,7 @@ class BinAnalysis(object):
 		sa = rebound.SimulationArchive(self.sa_name)
 		##Range of snapshots to get -- sometime bin files contain too many densely spaced snapshots.
 		##Make sure we get get data from only every 0.2 orbits...
-		self.tords=np.arange(0, self.tords[-1]+0.01*np.pi, 0.2*np.pi)
+		self.tords=np.arange(0, sa[-1].t+0.01*np.pi, 0.2*np.pi)
 		self.tords[0]=2.0e-15
 
 		sims= sa.getSimulations(self.tords)
