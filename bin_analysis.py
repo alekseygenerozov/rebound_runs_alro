@@ -348,6 +348,7 @@ class BinAnalysis(object):
 		try:
 			self.ts= np.genfromtxt(sa_name.replace('.bin', '_times'))
 			self.bins=np.genfromtxt(sa_name.replace('.bin','_bins.csv'), delimiter=',')
+			self.masses=np.genfromtxt(sa_name.replace('.bin', '_masses'))
 		except:
 			print "Generating bin table"
 			self.__bin_init__()
@@ -359,6 +360,21 @@ class BinAnalysis(object):
 		self.pairs=np.array([{int(self.bins[i,1]),int(self.bins[i,2])} for i in range(len(self.bins))])
 		tmp,idx=np.unique(self.pairs.astype(str), return_index=True)
 		self.pairs_u=self.pairs[idx]
+		##Filter pairs by mass
+		pairs_u_arr=np.array([list(pp) for pp in self.pairs_u])
+		filt=np.array([((self.masses[pp[0]-1]<=1.0e-4) & (self.masses[pp[1]-1]<=1.0e-4)) for pp in pairs_u_arr])
+		pairs_u_arr_light=pairs_u_arr[filt]
+		self.pairs_u_light=np.array([set(pp) for pp in pairs_u_arr_light])
+		filt=np.array([((self.masses[pp[0]-1]>1.0e-4) & (self.masses[pp[1]-1]>1.0e-4)) for pp in pairs_u_arr])
+		pairs_u_arr_heavy=pairs_u_arr[filt]
+		self.pairs_u_heavy=np.array([set(pp) for pp in pairs_u_arr_heavy])
+		filt=np.array([((self.masses[pp[0]-1]>1.0e-4) ^ (self.masses[pp[1]-1]>1.0e-4)) for pp in pairs_u_arr])
+		pairs_u_arr_heavy=pairs_u_arr[filt]
+		self.pairs_u_mixed=np.array([set(pp) for pp in pairs_u_arr_heavy])
+
+
+		# pair_u_arr_heavy=[self.masses[pp[0]>1.0e-4] & self.masses[pp[1]>1.0e-4] for pp in pairs_u_arr]
+		# self.pairs_u_heavy=np.array([set(pp) for pp in pair_u_arr_heavy])
 
 
 	def __bin_init__(self):
@@ -431,9 +447,9 @@ class BinAnalysis(object):
 		num_bins=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in self.ts]
 		return num_bins
 
-	def bin_times(self, norm=True):
+	def bin_times(self, norm=True, extra=''):
 		pairs=self.pairs
-		pairs_u=self.pairs_u
+		pairs_u=getattr(self, 'pairs_u'+extra)
 
 		t_survs=np.zeros(len(pairs_u))
 		##For each binary identify how long it survives
@@ -475,36 +491,37 @@ class BinAnalysis(object):
 
 		return t_survs
 
-	def bin_times_fast(self, norm=True):
-		pairs=self.pairs
-		pairs_u=self.pairs_u
-		t_survs=np.zeros(len(pairs_u))
-		##For each binary identify how long it survives
-		for ii,pp in enumerate(pairs_u):
-			##Identify all times where each binary pair exists.
-			t_bin=self.times_arr[pairs==pp]
-			#Index of one of the stars in the pair
-			idx=self.pairs_arr[pairs==pp][0,1]
-			idx2=self.pairs_arr[pairs==pp][0,0]
-			##snapshots are more or less regularly spaced: interval between 
-			##snapshots typically does not vary by more than 5%.
-			indics=np.where(np.diff(t_bin)>1.5*(self.ts[2]-self.ts[1]))[0]+1
-			t_bin=np.split(t_bin, indics)
-			##Binary survival time (take the longest segment)
-			t_surv=max([tt[-1]-tt[0] for tt in t_bin])
-			##Binary orbital period -- not this is not a constant--take the minimum orbital period 
-			if norm:
-				sa = rebound.SimulationArchive(self.sa_name)
-				m1=sa[0].particles[idx].m
-				m2=sa[0].particles[idx2].m
-				t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
-				t_surv=t_surv/t_orb
-			t_survs[ii]=t_surv
+	# def bin_times_fast(self, norm=True):
+	# 	pairs=self.pairs
+	# 	pairs_u=self.pairs_u
+	# 	t_survs=np.zeros(len(pairs_u))
+	# 	##For each binary identify how long it survives
+	# 	for ii,pp in enumerate(pairs_u):
+	# 		##Identify all times where each binary pair exists.
+	# 		t_bin=self.times_arr[pairs==pp]
+	# 		#Index of one of the stars in the pair
+	# 		idx=self.pairs_arr[pairs==pp][0,1]
+	# 		idx2=self.pairs_arr[pairs==pp][0,0]
+	# 		##snapshots are more or less regularly spaced: interval between 
+	# 		##snapshots typically does not vary by more than 5%.
+	# 		indics=np.where(np.diff(t_bin)>1.5*(self.ts[2]-self.ts[1]))[0]+1
+	# 		t_bin=np.split(t_bin, indics)
+	# 		##Binary survival time (take the longest segment)
+	# 		t_surv=max([tt[-1]-tt[0] for tt in t_bin])
+	# 		##Binary orbital period -- not this is not a constant--take the minimum orbital period 
+	# 		if norm:
+	# 			sa = rebound.SimulationArchive(self.sa_name)
+	# 			m1=sa[0].particles[idx].m
+	# 			m2=sa[0].particles[idx2].m
+	# 			t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
+	# 			t_surv=t_surv/t_orb
+	# 		t_survs[ii]=t_surv
 
-		return t_survs
+	# 	return t_survs
 
-	def bin_pairs_sort(self):
-		return self.pairs_u[np.argsort(self.bin_times(norm=False))]
+	def bin_pairs_sort(self, extra=''):
+		pairs_u=getattr(self, 'pairs_u'+extra)
+		return pairs_u[np.argsort(self.bin_times(norm=False, extra=extra))]
 
 
 
