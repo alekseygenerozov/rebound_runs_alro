@@ -433,10 +433,11 @@ class BinAnalysis(object):
 
 	def bin_times(self, norm=True):
 		pairs=self.pairs
-		t_survs=np.zeros(len(pairs))
-		sa = rebound.SimulationArchive(self.sa_name)
+		pairs_u=self.pairs_u
+
+		t_survs=np.zeros(len(pairs_u))
 		##For each binary identify how long it survives
-		for ii,pp in enumerate(pairs):
+		for ii,pp in enumerate(pairs_u):
 			##Identify all times where each binary pair exists.
 			t_bin=self.times_arr[pairs==pp]
 			t_surv=t_bin[-1]-t_bin[0]
@@ -446,9 +447,14 @@ class BinAnalysis(object):
 
 			##Edge case: Binary splits up and forms again. See if the binary has skipped any snapshots.
 			##Note that snapshots may not be exactly evenly spaced in time...
+			# if np.any(lens>1):
+			# 	print self.sa_name,np.array([self.ts[np.where(np.abs(self.ts-t_bin[jj])/t_bin[jj]<1.0e-12)[0]] for jj in range(len(t_bin))])[lens>1]
 			diffs=np.diff([np.where(np.abs(self.ts-t_bin[jj])/t_bin[jj]<1.0e-12)[0][0] for jj in range(len(t_bin))])
-			if np.any(diffs>1.01):
-				tmp=np.split(t_bin, np.where(diffs>1.01)[0]+1)
+			## This second line is necessary in cases for which we have duplicate snapshots.
+			diffs1=np.diff([np.where(np.abs(self.ts-t_bin[jj])/t_bin[jj]<1.0e-12)[0][-1] for jj in range(len(t_bin))])
+
+			if np.any(((np.where(diffs>1.01)[0]) & (np.where(diffs1>1.01)[0]))):
+				tmp=np.split(t_bin, np.where((np.where(diffs>1.01)[0]) & (np.where(diffs1>1.01)[0]))[0]+1)
 				tmp2=[tmp[i][-1]-tmp[i][0] for i in range(len(tmp))]
 				order=np.argsort(tmp2)
 				t_bin=tmp[order[-1]]
@@ -458,12 +464,13 @@ class BinAnalysis(object):
 			#sim=sa.getSimulation(t_bin[-1])
 			#sim.move_to_com()
 			#t_orb=sim.particles[idx].P
-			##Binary orbital period -- not this is not a constant--take the minimum orbital period 
-			m1=sa[0].particles[idx].m
-			m2=sa[0].particles[idx2].m
-			t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
+			##Binary orbital period -- not this is not a constant--take the minimum orbital period
 			if norm:
-				t_surv=t_surv/t_orb
+				sa = rebound.SimulationArchive(self.sa_name)
+				m1=sa[0].particles[idx].m
+				m2=sa[0].particles[idx2].m
+				t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
+				t_surv=t_surv/t_orb 
 			t_survs[ii]=t_surv
 
 		return t_survs
@@ -481,7 +488,7 @@ class BinAnalysis(object):
 			idx2=self.pairs_arr[pairs==pp][0,0]
 			##snapshots are more or less regularly spaced: interval between 
 			##snapshots typically does not vary by more than 5%.
-			indics=np.where(np.diff(t_bin)>1.5*(self.ts[1]-self.ts[0]))[0]+1
+			indics=np.where(np.diff(t_bin)>1.5*(self.ts[2]-self.ts[1]))[0]+1
 			t_bin=np.split(t_bin, indics)
 			##Binary survival time (take the longest segment)
 			t_surv=max([tt[-1]-tt[0] for tt in t_bin])
@@ -497,7 +504,7 @@ class BinAnalysis(object):
 		return t_survs
 
 	def bin_pairs_sort(self):
-		return self.pairs_u[np.argsort(self.bin_times_fast(norm=False))]
+		return self.pairs_u[np.argsort(self.bin_times(norm=False))]
 
 
 

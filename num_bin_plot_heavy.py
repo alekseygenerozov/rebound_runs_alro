@@ -8,6 +8,7 @@ import argparse
 
 
 
+
 def num_analytic(num, v, m=5.0e-5):
 	'''
 	Analytic estimate for number of binaries 
@@ -16,14 +17,20 @@ def num_analytic(num, v, m=5.0e-5):
 	v--velocity dispersion 
 	m--mass of each star (5x10^-5) by default
 
-	The disk is has an r^-2 profile and extends from r=1 to r=2.
-	'''
-	ro=1.
-	norm=0.32*ro**-3.
-	rh=(m/3.)**(1./3.)*ro
-	vh=rh*(ro)**-1.5
+	The disk is has an r^-3 surface density profile and extends from r=1 to r=2. (NB the corresponds to dN/da~a^-2)
 
-	return 0.39*num**2*norm*(4.*np.pi/3.)*rh**2.*(v/vh)**-4.
+	A lot of this is hard-coded for particular parameters; would be nice to generalize
+	'''
+	##Normalization of r^-3 surface density corresponding to a single star.
+	norm=0.32
+	##Measure vh at r=1.2--Not very well motivated but this gives a decent approximation v/vh throughout the disk 
+	##the disk...
+	r1=1.2
+	rh=(m/3.)**(1./3.)*r1
+	vh=rh*(r1)**-1.5
+
+	##Numerical pre-factor comes from doing integral over the disk
+	return (7./8.)*(2.*np.pi/3.)/(np.pi)*num**2*norm*(4.*np.pi/3.)*rh**2.*(v/vh)**-4.
 
 parser=argparse.ArgumentParser(description='Plot number of binaries after a rebound run')
 parser.add_argument('-b', '--base', help='Location of sim data')
