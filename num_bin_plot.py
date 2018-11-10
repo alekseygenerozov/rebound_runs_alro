@@ -54,6 +54,7 @@ def num_analytic_b(num, sig1, v_file,  m=5.0e-5):
 		# v=(v_file['bin_{0}'.format(jj)][...]['col2']**2.+v_file['bin_{0}'.format(jj)][...]['col3']**2.)**0.5
 		v=v_file['bin_{0}'.format(jj)][...]['col2']
 
+
 		##Number of binaries w/in each annulus
 		print (2.*num*np.pi*a_ords[jj]*delta_a*sig1(a_ords[jj]))
 		tot+=4.*np.pi/3.*num*sig1(a_ords[jj])*rh**2.*(v/vh)**-4*(2.*num*np.pi*a_ords[jj]*delta_a*sig1(a_ords[jj]))
@@ -107,9 +108,9 @@ for ii,name in enumerate(names):
 
 	vs=np.genfromtxt(base+name.replace('.bin', '_sigs'))
 	ms=np.genfromtxt(base+name.replace('.bin', '_masses'))
-	f=h5py.File(name.replace('.bin','_sigs.h5'))
-	#nums_analytic = num_analytic(len(ms)-1., vs[:,2], mass)
-	nums_analytic=num_analytic_b(len(ms)-1, sig_a3, f, mass)
+	#f=h5py.File(name.replace('.bin','_sigs.h5'))
+	nums_analytic = num_analytic(len(ms)-1., vs[:,2], mass)
+	#nums_analytic=num_analytic_b(len(ms)-1, sig_a3, f, mass)
 
 	##Ensure number of binaries evaluate for the same grid of times
 	nums=interp1d(ts, nums)(t_std)
@@ -130,6 +131,7 @@ ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax),
 
 ##Analytic prediction
 nums_med_analytic=np.median(num_bins_analytic, axis=0)
+print nums_med_analytic[-1]
 err=sem(num_bins_analytic, axis=0)
 if analyt:
 	ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\

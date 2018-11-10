@@ -380,7 +380,8 @@ class BinAnalysis(object):
 	def __bin_init__(self):
 		sa = rebound.SimulationArchive(self.sa_name)
 		##Range of snapshots to get -- sometime bin files contain too many densely spaced snapshots.
-		##Make sure we get get data from only every 0.2 orbits...
+		##Make sure we get get data from only every 0.1 orbits...Replace the last number with snapshot interval
+		##read directly from the simulation.
 		self.tords=np.arange(0, sa[-1].t+0.01*np.pi, 0.2*np.pi)
 		self.tords[0]=2.0e-15
 
@@ -397,6 +398,8 @@ class BinAnalysis(object):
 		self.bins=bins2
 
 		np.savetxt(self.sa_name.replace('.bin','_bins.csv'), self.bins,delimiter=',')
+		self.masses = np.array([pp.m for pp in sa[0].particles[1:]])
+		np.savetxt(self.sa_name.replace('.bin', '_masses'), self.masses)
 
 
 	def sigs(self, ii):

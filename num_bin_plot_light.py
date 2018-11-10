@@ -71,7 +71,7 @@ for ii,name in enumerate(names):
 
 	times_arr=bins_tab_light[:,0]
 	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in bins.ts]
-	vs=np.genfromtxt(base+name.replace('.bin', '_sigs_light'))
+	vs=np.genfromtxt(base+name.replace('.bin', '_sigs_low'))
 	ms=np.genfromtxt(base+name.replace('.bin', '_masses'))
 
 	nums_analytic = num_analytic(len(ms[ms<mheavy]), vs[:,2], mass)
@@ -86,12 +86,13 @@ for ii,name in enumerate(names):
 	num_bins_analytic.append(nums_analytic)
 
 
-##Analytic prediction
-# nums_med_analytic=np.median(num_bins_analytic, axis=0)
-# err=np.std(num_bins_analytic, axis=0)
-# ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
-# 			 color=col2, alpha=0.3)
-# ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
+#Analytic prediction
+nums_med_analytic=np.median(num_bins_analytic, axis=0)
+print nums_med_analytic[-1]
+err=np.std(num_bins_analytic, axis=0)
+ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
+			 color=col2, alpha=0.3)
+ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
 
 
 ##Median number of binaries and standard deviation as a function of time 
@@ -104,4 +105,4 @@ ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax),
 
 
 ax.legend()
-fig.savefig(base+'/num_bins_light.'+ext, transparent=True)
+fig.savefig(base+'/num_bins_light.'+ext)

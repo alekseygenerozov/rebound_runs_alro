@@ -10,8 +10,8 @@ bins=bin_analysis.BinAnalysis(name)
 ##Set up simulation archive
 #--------------------------------------------------------------------------------------------------_#
 sa=rebound.SimulationArchive(name)
-ms = np.array([pp.m for pp in sa[0].particles[1:]])
-np.savetxt(name.replace('.bin', '_masses'), ms)
+# ms = np.array([pp.m for pp in sa[0].particles[1:]])
+ms=np.genfromtxt(name.replace('.bin', '_masses'))
 #--------------------------------------------------------------------------------------------------_#
 ##Velocity dispersions to file
 sigs=np.empty([len(sa), 3])
@@ -26,8 +26,8 @@ for ii, sim in enumerate(sa):
 	sigs_low[ii] = np.std(vs[ms<1.0e-4], axis=0)
 	
 np.savetxt(name.replace('.bin', '_sigs'), sigs)
-np.savetxt(name.replace('.bin', '_sigs_high'), sigs)
-np.savetxt(name.replace('.bin', '_sigs_low'), sigs)
+np.savetxt(name.replace('.bin', '_sigs_high'), sigs_high)
+np.savetxt(name.replace('.bin', '_sigs_low'), sigs_low)
 ##Save orbital elements to hdf5 file.
 #--------------------------------------------------------------------------------------------------_#
 elem_names=['a', 'e', 'inc', 'omega']
