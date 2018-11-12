@@ -472,8 +472,9 @@ class BinAnalysis(object):
 			## This second line is necessary in cases for which we have duplicate snapshots.
 			diffs1=np.diff([np.where(np.abs(self.ts-t_bin[jj])/t_bin[jj]<1.0e-12)[0][-1] for jj in range(len(t_bin))])
 
-			if np.any(((np.where(diffs>1.01)[0]) & (np.where(diffs1>1.01)[0]))):
-				tmp=np.split(t_bin, np.where((np.where(diffs>1.01)[0]) & (np.where(diffs1>1.01)[0]))[0]+1)
+
+			if np.any((diffs>1.01) & (diffs1>1.01)):
+				tmp=np.split(t_bin, (np.where((diffs>1.01) & (diffs1>1.01)))[0]+1)
 				tmp2=[tmp[i][-1]-tmp[i][0] for i in range(len(tmp))]
 				order=np.argsort(tmp2)
 				t_bin=tmp[order[-1]]
