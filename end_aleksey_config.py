@@ -116,11 +116,16 @@ def main():
 		for j in range(0, N + 1):
 			M[j] = rand.uniform(0, 2 * np.pi)
 
+		f=open('init_disk', 'w')
+		f.write('{0:.16e} {1:.16e} {2:.16e} {3:.16e} {4:.16e} {5:.16e} {6:.16e}\n'.format(sim.particles[0].x, sim.particles[0].y, sim.particles[0].z,\
+			sim.particles[0].vx, sim.particles[0].vy, sim.particles[0].vz, sim.particles[0].m))
 		for l in range(0,N): # Adds stars
 			a0=density(a_min, a_max)
 			sim.add(m = m, a = a0, e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
-			print m, a0
+			f.write('{0:.16e} {1:.16e} {2:.16e} {3:.16e} {4:.16e} {5:.16e} {6:.16e}\n'.format(sim.particles[l+1].x, sim.particles[l+1].y, sim.particles[l+1].z,\
+			sim.particles[l+1].vx, sim.particles[l+1].vy, sim.particles[l+1].vz, sim.particles[l+1].m))
 		#print N, m, e, a_min, a_max, i_max
+		f.close()
 
 	fen=open(name.replace('.bin', '_en'), 'a')
 	fen.write(sim.gravity+'_'+sim.integrator+'_'+'{0}'.format(sim.dt))
@@ -144,7 +149,6 @@ def main():
 			bins=bin_find_sim(sim)
 
 	ms=np.array([pp.m for pp in sim.particles])
-	print len(ms[ms>1.0e-4]), len(ms)
 	sim.collision=coll
 	sim.collision_resolve=get_tde
 
