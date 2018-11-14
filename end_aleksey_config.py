@@ -13,22 +13,28 @@ import random as rand
 from rebound_runs.bin_analysis import bin_find_sim
 
 # Density function for semimajor axes (Hayden's implementation)
-def density(min1, max1):
-	xmin = 1 / max1
-	xmax = 1 / min1
-	x = np.linspace(xmin, xmax, num=10000)
-	f = 1 / x
-	rand = np.random.choice(f)
-	return rand
+# def density(min1, max1):
+# 	xmin = 1 / max1
+# 	xmax = 1 / min1
+# 	x = np.linspace(xmin, xmax, num=10000)
+# 	f = 1 / x
+# 	rand = np.random.choice(f)
+# 	return rand
 
 # Aleksey's implementation.
 # def density2(min1, max1):
 #     r=np.random.random(1)[0]
 #     return (1./min1-r*(1./min1-1./max1))**-1.
 
-def dens_correct(min1, max1):
+def density(min1, max1, p):
 	r=np.random.random(1)[0]
-	return min1*np.exp(r*np.log(max1/min1))
+	if p==1:
+		return min1*np.exp(r*np.log(max1/min1))
+	else:
+		return (r*(max1**(1.-p)-min1**(1.-p))+min1**(1.-p))**(1./(1-p))
+
+
+
 
 def heartbeat(sim):
 	print(sim.contents.dt, sim.contents.t)
@@ -70,7 +76,8 @@ def main():
 	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
 		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
-		'a_min':'1.', 'a_max':'2.', 'i_max':'5.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2'}, dict_type=OrderedDict)
+		'a_min':'1.', 'a_max':'2.', 'i_max':'5.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
+		'p':2}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
 
@@ -110,6 +117,7 @@ def main():
 		m=config.getfloat(ss, 'm')
 		a_min=config.getfloat(ss, 'a_min')
 		a_max=config.getfloat(ss, 'a_max')
+		p=config.getfloat(ss, 'p')
 		i_max=config.getfloat(ss, 'i_max')
 
 		M = np.zeros(N + 1)
@@ -120,7 +128,7 @@ def main():
 		f.write('{0:.16e} {1:.16e} {2:.16e} {3:.16e} {4:.16e} {5:.16e} {6:.16e}\n'.format(sim.particles[0].x, sim.particles[0].y, sim.particles[0].z,\
 			sim.particles[0].vx, sim.particles[0].vy, sim.particles[0].vz, sim.particles[0].m))
 		for l in range(0,N): # Adds stars
-			a0=density(a_min, a_max)
+			a0=density(a_min, a_max, p)
 			sim.add(m = m, a = a0, e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
 			f.write('{0:.16e} {1:.16e} {2:.16e} {3:.16e} {4:.16e} {5:.16e} {6:.16e}\n'.format(sim.particles[l+1].x, sim.particles[l+1].y, sim.particles[l+1].z,\
 			sim.particles[l+1].vx, sim.particles[l+1].vy, sim.particles[l+1].vz, sim.particles[l+1].m))
