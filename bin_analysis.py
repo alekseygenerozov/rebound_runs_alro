@@ -486,9 +486,8 @@ class BinAnalysis(object):
 			#t_orb=sim.particles[idx].P
 			##Binary orbital period -- not this is not a constant--take the minimum orbital period
 			if norm:
-				sa = rebound.SimulationArchive(self.sa_name)
-				m1=sa[0].particles[idx].m
-				m2=sa[0].particles[idx2].m
+				m1=self.masses[idx-1]
+				m2=self.masses[idx2-1]
 				t_orb = 2.*np.pi*np.min((self.bins[self.pairs==pp][:,4]**3./(m1+m2))**0.5)
 				t_surv=t_surv/t_orb 
 			t_survs[ii]=t_surv

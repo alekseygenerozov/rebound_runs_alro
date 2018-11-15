@@ -77,7 +77,7 @@ def main():
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
 		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
 		'a_min':'1.', 'a_max':'2.', 'i_max':'5.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
-		'p':2}, dict_type=OrderedDict)
+		'p':'2'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
 
