@@ -361,14 +361,15 @@ class BinAnalysis(object):
 		tmp,idx=np.unique(self.pairs.astype(str), return_index=True)
 		self.pairs_u=self.pairs[idx]
 		##Filter pairs by mass
+		mh_thres=np.median(self.masses)
 		pairs_u_arr=np.array([list(pp) for pp in self.pairs_u])
-		filt=np.array([((self.masses[pp[0]-1]<=1.0e-4) & (self.masses[pp[1]-1]<=1.0e-4)) for pp in pairs_u_arr])
+		filt=np.array([((self.masses[pp[0]-1]<=mh_thres) & (self.masses[pp[1]-1]<=mh_thres)) for pp in pairs_u_arr])
 		pairs_u_arr_light=pairs_u_arr[filt]
 		self.pairs_u_light=np.array([set(pp) for pp in pairs_u_arr_light])
-		filt=np.array([((self.masses[pp[0]-1]>1.0e-4) & (self.masses[pp[1]-1]>1.0e-4)) for pp in pairs_u_arr])
+		filt=np.array([((self.masses[pp[0]-1]>mh_thres) & (self.masses[pp[1]-1]>mh_thres)) for pp in pairs_u_arr])
 		pairs_u_arr_heavy=pairs_u_arr[filt]
 		self.pairs_u_heavy=np.array([set(pp) for pp in pairs_u_arr_heavy])
-		filt=np.array([((self.masses[pp[0]-1]>1.0e-4) ^ (self.masses[pp[1]-1]>1.0e-4)) for pp in pairs_u_arr])
+		filt=np.array([((self.masses[pp[0]-1]>mh_thres) ^ (self.masses[pp[1]-1]>mh_thres)) for pp in pairs_u_arr])
 		pairs_u_arr_heavy=pairs_u_arr[filt]
 		self.pairs_u_mixed=np.array([set(pp) for pp in pairs_u_arr_heavy])
 

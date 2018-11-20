@@ -22,8 +22,8 @@ for ii, sim in enumerate(sa):
 	sigs[ii] = np.std(vs,axis=0) 
 	np.savetxt(name.replace('.bin', '_sigs'), sigs)
 
-	sigs_high[ii] = np.std(vs[ms>=1.0e-4], axis=0)
-	sigs_low[ii] = np.std(vs[ms<1.0e-4], axis=0)
+	sigs_high[ii] = np.std(vs[ms<=np.median(ms)], axis=0)
+	sigs_low[ii] = np.std(vs[ms<np.median(ms)], axis=0)
 	
 np.savetxt(name.replace('.bin', '_sigs'), sigs)
 np.savetxt(name.replace('.bin', '_sigs_high'), sigs_high)
