@@ -450,7 +450,7 @@ class BinAnalysis(object):
 		num_bins=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in self.ts]
 		return num_bins
 
-	def bin_times(self, norm=True, extra=''):
+	def bin_times(self, norm=True, extra='', total=False):
 		pairs=self.pairs
 		pairs_u=getattr(self, 'pairs_u'+extra)
 
@@ -477,8 +477,8 @@ class BinAnalysis(object):
 				tmp=np.split(t_bin, (np.where((diffs>1.01) & (diffs1>1.01)))[0]+1)
 				tmp2=[tmp[i][-1]-tmp[i][0] for i in range(len(tmp))]
 				order=np.argsort(tmp2)
-				t_bin=tmp[order[-1]]
-				t_surv=tmp2[order[-1]]
+				# t_bin=tmp[order[-1]]
+				t_surv=tmp2[order[-1]] if not total else np.sum(tmp2)
 
 			##Survival time of the binary normalized to the binary orbital period
 			#sim=sa.getSimulation(t_bin[-1])

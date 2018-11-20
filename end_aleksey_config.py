@@ -133,8 +133,8 @@ def main():
 	f=open('init_disk', 'w')
 	sim.move_to_com()
 	for ii in range(len(sim.particles)):
-		f.write('{0:.16e} {1:.16e} {2:.16e} {3:.16e} {4:.16e} {5:.16e} {6:.16e}\n'.format(sim.particles[0].x, sim.particles[0].y, sim.particles[0].z,\
-			sim.particles[0].vx, sim.particles[0].vy, sim.particles[0].vz, sim.particles[0].m))
+		f.write('{0:.16e} {1:.16e} {2:.16e} {3:.16e} {4:.16e} {5:.16e} {6:.16e}\n'.format(sim.particles[ii].x, sim.particles[ii].y, sim.particles[ii].z,\
+			sim.particles[ii].vx, sim.particles[ii].vy, sim.particles[ii].vz, sim.particles[ii].m))
 	f.close()
 
 	fen=open(name.replace('.bin', '_en'), 'a')

@@ -55,8 +55,8 @@ mheavy=args.mheavy
 fig,ax=plt.subplots(figsize=(10,9))
 ax.set_xlabel('Time [Orbits]')
 ax.set_ylabel('Number of binaries')
-ax.set_xlim(0, tmax)
-ax.set_ylim(0, ymax)
+ax.set_xlim(1, tmax)
+ax.set_ylim(0.0001, ymax)
 
 t_std=np.arange(1.0e-14,(1.01)*tmax*2.*np.pi, 0.2*np.pi)
 num_bins=[]
@@ -87,22 +87,22 @@ for ii,name in enumerate(names):
 
 
 #Analytic prediction
-nums_med_analytic=np.median(num_bins_analytic, axis=0)
+nums_med_analytic=np.mean(num_bins_analytic, axis=0)
 print nums_med_analytic[-1]
 err=np.std(num_bins_analytic, axis=0)
-ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
-			 color=col2, alpha=0.3)
-ax.plot(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
+# ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
+# 			 color=col2, alpha=0.3)
+ax.loglog(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
 
 
 ##Median number of binaries and standard deviation as a function of time 
-nums_med=np.median(num_bins, axis=0)
+nums_med=np.mean(num_bins, axis=0)
 err=np.std(num_bins, axis=0)
-ax.fill_between(t_std/(2.*np.pi), nums_med-err, nums_med+err,\
-			 color=col1, alpha=0.3)
-ax.plot(t_std/(2.*np.pi), nums_med, color=col1, label='Simulation')
-ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax), horizontalalignment='right')
+# ax.fill_between(t_std/(2.*np.pi), nums_med-err, nums_med+err,\
+# 			 color=col1, alpha=0.3)
+ax.loglog(t_std/(2.*np.pi), nums_med, color=col1, label='Simulation')
+# ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax), horizontalalignment='right')
 
 
-ax.legend()
+# ax.legend()
 fig.savefig(base+'/num_bins_light.'+ext)
