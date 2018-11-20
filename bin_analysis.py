@@ -72,7 +72,7 @@ def bin_props(p1, p2):
 	##Unit vector pointing from particle 2 to particle 1
 	rhat = np.array(dp.xyz)/d2**0.5
 	f12 = m1*m2/d2*rhat 
-	##Subtract the mutual force between the two stars; this leaves the tidal force the star experiences
+	##Tidal force that star 2 experiences
 	ft = ft - f12
 	ft = np.linalg.norm(ft)
 
