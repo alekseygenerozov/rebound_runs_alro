@@ -83,10 +83,13 @@ for ii,name in enumerate(names):
 	except Exception as e:
 		print e.message
 		continue
-	a_thres=2.*mass/v_arr**2.
-	print a_thres[-1]
+	a_thres=2.*mass/3./v_arr**2.
+	# print a_thres[-1]
 	filt_a=bins_tab_light[:,4]>=a_thres
 	bins_tab_light=bins_tab_light[filt_a]
+	times_arr=bins_tab_light[:,0]
+
+
 
 	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in ts]
 	nums_analytic = num_analytic(len(ms[ms<mheavy]), vs, mass)
