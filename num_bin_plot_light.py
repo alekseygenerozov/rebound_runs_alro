@@ -78,16 +78,16 @@ for ii,name in enumerate(names):
 	bins_tab_light=bins_tab[(bins_tab[:,1]<idx) & (bins_tab[:,2]<idx)]
 	times_arr=bins_tab_light[:,0]
 	
-	try:
-		v_arr=extrap.extrap1d(interp1d(ts, vs))(times_arr)
-	except Exception as e:
-		print e.message
-		continue
-	a_thres=2.*mass/3./v_arr**2.
-	# print a_thres[-1]
-	filt_a=bins_tab_light[:,4]>=a_thres
-	bins_tab_light=bins_tab_light[filt_a]
-	times_arr=bins_tab_light[:,0]
+	# try:
+	# 	v_arr=extrap.extrap1d(interp1d(ts, vs))(times_arr)
+	# except Exception as e:
+	# 	print e.message
+	# 	continue
+	# a_thres=2.*mass/3./v_arr**2.
+	# # print a_thres[-1]
+	# filt_a=bins_tab_light[:,4]>=a_thres
+	# bins_tab_light=bins_tab_light[filt_a]
+	# times_arr=bins_tab_light[:,0]
 
 
 
