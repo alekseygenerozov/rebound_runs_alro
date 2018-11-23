@@ -6,6 +6,7 @@ import sys
 from latex_exp import latex_exp
 import argparse
 
+from extrap import extrap
 
 
 def num_analytic(num, v, m=5.0e-5):
@@ -64,18 +65,31 @@ num_bins_analytic=[]
 names=np.genfromtxt(base+'/names', dtype=str)
 ##Iterating over all runs
 for ii,name in enumerate(names):
-	idx=np.where(np.genfromtxt(base+name.replace('.bin', '_masses'))>mheavy)[0][0]+1
 	bins=bin_analysis.BinAnalysis(base+name)
 	bins_tab=bins.bins
-	bins_tab_light=bins_tab[(bins_tab[:,1]<idx) & (bins_tab[:,2]<idx)]
-
-	times_arr=bins_tab_light[:,0]
-	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in bins.ts]
 	vs=np.genfromtxt(base+name.replace('.bin', '_sigs_low'))
+	##Taking only the z-component of the velocity dispersion
+	vs=vs[:,2]
 	ms=np.genfromtxt(base+name.replace('.bin', '_masses'))
-
-	nums_analytic = num_analytic(len(ms[ms<mheavy]), vs[:,2], mass)
 	ts=bins.ts
+
+	##Select only the light-light binaries
+	idx=np.where(np.genfromtxt(base+name.replace('.bin', '_masses'))>mheavy)[0][0]+1
+	bins_tab_light=bins_tab[(bins_tab[:,1]<idx) & (bins_tab[:,2]<idx)]
+	times_arr=bins_tab_light[:,0]
+	
+	try:
+		v_arr=extrap.extrap1d(interp1d(ts, vs))(times_arr)
+	except Exception as e:
+		print e.message
+		continue
+	a_thres=2.*mass/v_arr**2.
+	print a_thres[-1]
+	filt_a=bins_tab_light[:,4]>=a_thres
+	bins_tab_light=bins_tab_light[filt_a]
+
+	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in ts]
+	nums_analytic = num_analytic(len(ms[ms<mheavy]), vs, mass)
 	if len(ts)<10.01*tmax:
 		continue
 	##Ensure number of binaries evaluate for the same grid of times
@@ -84,6 +98,7 @@ for ii,name in enumerate(names):
 	##Append data to list
 	num_bins.append(nums)
 	num_bins_analytic.append(nums_analytic)
+
 
 
 #Analytic prediction
@@ -104,5 +119,5 @@ ax.loglog(t_std/(2.*np.pi), nums_med, color=col1, label='Simulation')
 # ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax), horizontalalignment='right')
 
 
-# ax.legend()
+ax.legend()
 fig.savefig(base+'/num_bins_light.'+ext)
