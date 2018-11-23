@@ -31,7 +31,8 @@ def num_analytic(num, v, m=5.0e-5):
 parser=argparse.ArgumentParser(description='Plot number of binaries after a rebound run')
 parser.add_argument('-b', '--base', help='Location of sim data')
 parser.add_argument('-m', '--mass', type=float, help='Mass of each star (only used for analytic comparison)')
-parser.add_argument('-y', '--ymax', type=float, default=20., help='Maximum y for plot')
+parser.add_argument('--ymax', type=float, default=20., help='Maximum y for plot')
+parser.add_argument('--ymin', type=float, default=20., help='Maximum y for plot')
 parser.add_argument('-t', '--tmax', type=float, default=20., help='Maximum time for plot')
 parser.add_argument('-c1', '--col1', default='black', help='Color for simulation results')
 parser.add_argument('-c2', '--col2', default='red', help='Color for analytic prediction')
@@ -47,6 +48,7 @@ base=args.base
 mass=args.mass
 tmax=args.tmax
 ymax=args.ymax
+ymin=args.ymin
 col1=args.col1
 col2=args.col2
 col3=args.col3
@@ -57,7 +59,7 @@ fig,ax=plt.subplots(figsize=(10,9))
 ax.set_xlabel('Time [Orbits]')
 ax.set_ylabel('Number of binaries')
 ax.set_xlim(1, tmax)
-ax.set_ylim(0.0001, ymax)
+ax.set_ylim(ymin, ymax)
 
 t_std=np.arange(1.0e-14,(1.01)*tmax*2.*np.pi, 0.2*np.pi)
 num_bins=[]
