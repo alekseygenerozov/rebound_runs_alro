@@ -3,7 +3,11 @@ import rebound
 import sys
 import numpy as np
 
+
 from astropy.table import Table
+
+def vh(m, a):
+	return m**(1./3.)*a**-0.5
 
 name=sys.argv[1]
 bins=bin_analysis.BinAnalysis(name)
@@ -42,3 +46,9 @@ for ii in range(0, len(sa), interval):
 	tab=Table(elems, names=elem_names)	
 	
 	tab.write(name.replace('.bin','_elems.hdf5'), '/{0}'.format(ii), format='hdf5', append=True, overwrite=True)
+	##Low mass stars
+	filt1=(ms<=np.median(ms)
+	##Ignore any unbound stars
+	filt2=(tab['a']>0)
+
+	np.savetxt(name.replace('.bin', '_vvh_ratio_low'), np.std(vs[filt1 & filt2][:,2]/vh(np.min(ms), tab['a'][filt1 & filt2])))

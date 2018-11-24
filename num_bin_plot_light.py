@@ -37,7 +37,7 @@ parser.add_argument('-t', '--tmax', type=float, default=20., help='Maximum time 
 parser.add_argument('-c1', '--col1', default='black', help='Color for simulation results')
 parser.add_argument('-c2', '--col2', default='red', help='Color for analytic prediction')
 parser.add_argument('-c3', '--col3', default='green', help='Color for analytic prediction')
-parser.add_argument('-mh', '--mheavy', default=1.0e-4, help='Mass separating heavies from the light')
+# parser.add_argument('-mh', '--mheavy', default=1.0e-4, help='Mass separating heavies from the light')
 parser.add_argument('-e', '--ext', default='png', help='extension for image file')
 
 
@@ -53,7 +53,7 @@ col1=args.col1
 col2=args.col2
 col3=args.col3
 ext=args.ext
-mheavy=args.mheavy
+# mheavy=args.mheavy
 
 fig,ax=plt.subplots(figsize=(10,9))
 ax.set_xlabel('Time [Orbits]')
@@ -73,10 +73,11 @@ for ii,name in enumerate(names):
 	##Taking only the z-component of the velocity dispersion
 	vs=vs[:,2]
 	ms=np.genfromtxt(base+name.replace('.bin', '_masses'))
+	mheavy=np.median(ms)
 	ts=bins.ts
 
 	##Select only the light-light binaries
-	idx=np.where(np.genfromtxt(base+name.replace('.bin', '_masses'))>mheavy)[0][0]+1
+	idx=np.where(ms>mheavy)[0][0]+1
 	bins_tab_light=bins_tab[(bins_tab[:,1]<idx) & (bins_tab[:,2]<idx)]
 	times_arr=bins_tab_light[:,0]
 	
@@ -94,7 +95,7 @@ for ii,name in enumerate(names):
 
 
 	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in ts]
-	nums_analytic = num_analytic(len(ms[ms<mheavy]), vs, mass)
+	nums_analytic = num_analytic(len(ms[ms<=mheavy]), vs, mass)
 	if len(ts)<10.01*tmax:
 		continue
 	##Ensure number of binaries evaluate for the same grid of times
