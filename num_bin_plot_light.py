@@ -28,6 +28,25 @@ def num_analytic(num, v, m=5.0e-5):
 	##Numerical pre-factor comes from doing integral over the disk
 	return (7./8.)*(2.*np.pi/3.)/(np.pi)*num**2*norm*(4.*np.pi/3.)*rh**2.*(v/vh)**-4.
 
+def num_analytic_b(num, vratio, m=5.0e-5):
+	'''
+	Analytic estimate for number of binaries 
+
+	num--number of star's in sim
+	v--velocity dispersion 
+	m--mass of each star (5x10^-5) by default
+
+	The disk is has an r^-3 surface density profile and extends from r=1 to r=2. (NB the corresponds to dN/da~a^-2)
+	'''
+	##Normalization of r^-3 surface density corresponding to a single star.
+	norm=0.32
+	r1=1.2
+	rh=(m/3.)**(1./3.)*r1
+	# vh=rh*(r1)**-1.5
+
+	##Numerical pre-factor comes from doing integral over the disk
+	return (7./8.)*(2.*np.pi/3.)/(np.pi)*num**2*norm*(4.*np.pi/3.)*rh**2.*(vratio)**-4.
+
 parser=argparse.ArgumentParser(description='Plot number of binaries after a rebound run')
 parser.add_argument('-b', '--base', help='Location of sim data')
 parser.add_argument('-m', '--mass', type=float, help='Mass of each star (only used for analytic comparison)')
@@ -77,7 +96,7 @@ for ii,name in enumerate(names):
 	ts=bins.ts
 
 	##Select only the light-light binaries
-	idx=np.where(ms>mheavy)[0][0]+1
+	idx=np.where(ms<=mheavy)[0][-1]+1
 	bins_tab_light=bins_tab[(bins_tab[:,1]<idx) & (bins_tab[:,2]<idx)]
 	times_arr=bins_tab_light[:,0]
 	
@@ -95,7 +114,9 @@ for ii,name in enumerate(names):
 
 
 	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in ts]
-	nums_analytic = num_analytic(len(ms[ms<=mheavy]), vs, mass)
+	vvh=np.genfromtxt(name.replace('.bin', '_vvh_ratio_low'))
+	#nums_analytic = num_analytic(len(ms[ms<=mheavy]), vs, mass)
+	nums_analytic = num_analytic_b(len(ms[ms<=mheavy]), vvh, mass)
 	if len(ts)<10.01*tmax:
 		continue
 	##Ensure number of binaries evaluate for the same grid of times
@@ -126,4 +147,4 @@ ax.loglog(t_std/(2.*np.pi), nums_med, color=col1, label='Simulation')
 
 
 ax.legend()
-fig.savefig(base+'/num_bins_light.'+ext)
+# fig.savefig(base+'/num_bins_light.'+ext)

@@ -21,22 +21,13 @@ ms=np.genfromtxt(name.replace('.bin', '_masses'))
 sigs=np.empty([len(sa), 3])
 sigs_low=np.empty([len(sa), 3])
 sigs_high=np.empty([len(sa), 3])
-for ii, sim in enumerate(sa):
-	vs = np.array([np.array(pp.vxyz) for pp in sim.particles[1:]])
-	sigs[ii] = np.std(vs,axis=0) 
 
-	sigs_high[ii] = np.std(vs[ms>np.median(ms)], axis=0)
-	sigs_low[ii] = np.std(vs[ms<=np.median(ms)], axis=0)
-	
-np.savetxt(name.replace('.bin', '_sigs'), sigs)
-np.savetxt(name.replace('.bin', '_sigs_high'), sigs_high)
-np.savetxt(name.replace('.bin', '_sigs_low'), sigs_low)
 ##Save orbital elements to hdf5 file.
 #--------------------------------------------------------------------------------------------------_#
 elem_names=['a', 'e', 'inc', 'omega']
 #elem_names=['a', 'e']
 interval=1
-sigs_low_b=np.empty(len(sa))
+# sigs_low_b=np.empty(len(sa))
 
 for ii in range(0, len(sa), interval):
 	sim=sa[ii]
@@ -51,9 +42,16 @@ for ii in range(0, len(sa), interval):
 	tab.write(name.replace('.bin','_elems.hdf5'), '/{0}'.format(ii), format='hdf5', append=True, overwrite=True)
 	##Low mass stars
 	filt1=(ms<=np.median(ms))
+	filt1b=(ms>np.median(ms))
 	##Ignore any unbound stars
 	filt2=(tab['a']>0)
+	#sigs_low_b[ii]=np.std(vs[filt1 & filt2][:,2]/vh(np.min(ms), tab['a'][filt1 & filt2]))
+	sigs[ii] = np.std(vs[filt2],axis=0) 
+	sigs_high[ii] = np.std(vs[filt1b & filt2], axis=0)
+	sigs_low[ii] = np.std(vs[filt1 & filt2], axis=0)
 
-	sigs_low_b[ii]=np.std(vs[filt1 & filt2][:,2]/vh(np.min(ms), tab['a'][filt1 & filt2]))
 
-np.savetxt(name.replace('.bin', '_vvh_ratio_low'), sigs_low_b)
+np.savetxt(name.replace('.bin', '_sigs'), sigs)
+np.savetxt(name.replace('.bin', '_sigs_high'), sigs_high)
+np.savetxt(name.replace('.bin', '_sigs_low'), sigs_low)
+#np.savetxt(name.replace('.bin', '_vvh_ratio_low'), sigs_low_b)
