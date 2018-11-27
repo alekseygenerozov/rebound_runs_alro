@@ -44,7 +44,7 @@ def gen_disk(ang):
 	ehat = rotate_vec(angle2,bhat,ehat)
 	ehat = rotate_vec(angle3,jhat,ehat)    
 	n = np.cross(np.array([0,0,1]), jhat)
-	n = n / norm(n)   
+	n = n / np.linalg.norm(n)   
 	Omega = math.atan2(n[1], n[0])
 	omega = math.acos(np.dot(n, ehat))
 	if ehat[2] < 0:
@@ -105,7 +105,7 @@ def main():
 	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
 		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
-		'a_min':'1.', 'a_max':'2.', 'i_max':'5.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
+		'a_min':'1.', 'a_max':'2.', 'ang':'2.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
 		'p':'1'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
@@ -147,7 +147,7 @@ def main():
 		a_min=config.getfloat(ss, 'a_min')
 		a_max=config.getfloat(ss, 'a_max')
 		p=config.getfloat(ss, 'p')
-		ang=config.getfloat(ss, 'ang_params')
+		ang=config.getfloat(ss, 'ang')
 
 		##Use AM's code to generate disk with aligned eccentricity vectors, but a small scatter in i and both omegas...
 		inc, Omega, omega=gen_disk(ang)
