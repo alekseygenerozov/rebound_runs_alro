@@ -7,6 +7,7 @@ from latex_exp import latex_exp
 import argparse
 
 from extrap import extrap
+from scipy.stats import sem
 
 
 def num_analytic(num, v, m=5.0e-5):
@@ -114,9 +115,9 @@ for ii,name in enumerate(names):
 
 
 	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in ts]
-	vvh=np.genfromtxt(name.replace('.bin', '_vvh_ratio_low'))
-	#nums_analytic = num_analytic(len(ms[ms<=mheavy]), vs, mass)
-	nums_analytic = num_analytic_b(len(ms[ms<=mheavy]), vvh, mass)
+	#vvh=np.genfromtxt(name.replace('.bin', '_vvh_ratio_low'))
+	nums_analytic = num_analytic(len(ms[ms<=mheavy]), vs, mass)
+	#nums_analytic = num_analytic_b(len(ms[ms<=mheavy]), vvh, mass)
 	if len(ts)<10.01*tmax:
 		continue
 	##Ensure number of binaries evaluate for the same grid of times
@@ -131,20 +132,21 @@ for ii,name in enumerate(names):
 #Analytic prediction
 nums_med_analytic=np.mean(num_bins_analytic, axis=0)
 print nums_med_analytic[-1]
-err=np.std(num_bins_analytic, axis=0)
-# ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
-# 			 color=col2, alpha=0.3)
+err=sem(num_bins_analytic, axis=0)
+ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
+			 color=col2, alpha=0.3)
 ax.loglog(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
 
 
 ##Median number of binaries and standard deviation as a function of time 
 nums_med=np.mean(num_bins, axis=0)
-err=np.std(num_bins, axis=0)
-# ax.fill_between(t_std/(2.*np.pi), nums_med-err, nums_med+err,\
-# 			 color=col1, alpha=0.3)
+err=sem(num_bins, axis=0)
+ax.fill_between(t_std/(2.*np.pi), nums_med-err, nums_med+err,\
+			 color=col1, alpha=0.3)
 ax.loglog(t_std/(2.*np.pi), nums_med, color=col1, label='Simulation')
 # ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax), horizontalalignment='right')
 
 
 ax.legend()
+plt.show()
 # fig.savefig(base+'/num_bins_light.'+ext)
