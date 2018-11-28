@@ -49,7 +49,8 @@ def num_analytic(num, v, m=5.0e-5):
 	rh=rh0*r1	
 	vh=rh*(r1)**-1.5
 
-	##Numerical pre-factor comes from doing integral over the disk
+	##Numerical pre-factor comes from doing integral over the disk--Should in principlel replace rh with rh0, but
+	##this makes the agreement worse not better.  
 	return (7./8.)*(2.*np.pi/3.)/(np.pi)*num**2*norm*(4.*np.pi/3.)*rh**2.*(v/vh)**-4.
 
 def num_analytic_b(num, vratio, m=5.0e-5):
@@ -156,14 +157,8 @@ for ii,name in enumerate(names):
 	# num_bins_analytic.append(nums_analytic)
 
 vs=np.mean(vs_all, axis=0)
-pfit = np.genfromtxt(base+'pfit')
-tfit=pfit[:,0]
-mus=pfit[:,1]
-s=pfit[:,2]
-# #Analytic prediction
-nums_med_analytic=num_analytic_gen(np.mean(nstars), vs, interp1d(tfit, mus)(t_std), interp1d(tfit, s)(t_std), mass)
 print np.mean(nstars)
-# nums_med_analytic=num_analytic(np.mean(nstars), vs, mass)
+nums_med_analytic=num_analytic(np.mean(nstars), vs, mass)
 print nums_med_analytic
 
 
