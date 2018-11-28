@@ -134,13 +134,13 @@ def bin_find(loc):
 		com_d, a_bin, e_bin, p1_com, p2_com, d2, inc, ft = bin_props(ps[i1], ps[i2])
 		m1,m2 =ps[i1].m, ps[i2].m
 		##Hill sphere condition.
-		inside_hill=(a_bin<((m1+m2)/m0)**(1./3.)*com_d)
+		inside_hill=(a_bin*(1+e_bin)<((m1+m2)/m0/3.)**(1./3.)*com_d)
 		tidal_2 = (m1*m2/d2>ft)
 
 		##If the kinetic energy is less than the potential energy 
 		if ((a_bin>0) and (inside_hill) and (tidal_2)):
 		#if ((a_bin>0) and (inside_hill)):
-			rh=(((m1+m2)/m0)**(1./3.)*com_d)
+			rh=(((m1+m2)/m0/3.)**(1./3.)*com_d)
 			vh=rh*(m0/com_d**3.)**0.5
 			bin_indics.append([sim.t, i1, i2, d2**0.5, a_bin, a_bin/(((m1+m2)/m0)**(1./3.)*com_d), e_bin, rh, vh])
 
