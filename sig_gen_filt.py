@@ -13,6 +13,7 @@ ms=np.genfromtxt(name.replace('.bin', '_masses'))
 sigs_light=np.empty([num_bins, len(sa), 4])
 sigs_heavy=np.empty([num_bins, len(sa), 4])
 for ii,sim in enumerate(sa):
+	print ii
 	##Orbital smas and eccentricities
 	orbits = sim.calculate_orbits(primary=sim.particles[0])
 	odat=np.array([[oo.a, oo.e] for oo in orbits])
@@ -35,4 +36,5 @@ for ii,sim in enumerate(sa):
 		# 	continue
 		# tmp = np.mean(eccs[filt & filt_light]**2.)**0.5/2.**0.5*(1./(np.mean([a_in, a_out])))**0.5
 		# sigs_light[jj,ii] = np.hstack([np.std(vs[filt & filt_light], axis=0), tmp])
-		Table(vs[filt & filt_light]).write(name.replace('.bin', '_vs.h5'), path='/bin/{0}/{1}'.format(ii, jj), append=True, overwrite=True)
+		Table([a1[filt_light], vs[filt_light]], names=['a','vz']).write(name.replace('.bin', '_vs.h5'), path='/bin/{0}'.format(ii), append=True, overwrite=True)
+		#np.savetxt(name.replace('.bin', '_vs_{0}_{1}'.format(ii, jj)), vs[filt])
