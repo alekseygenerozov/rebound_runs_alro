@@ -9,6 +9,28 @@ import argparse
 from extrap import extrap
 from scipy.stats import sem
 
+from scipy.special import erf
+
+def num_analytic_gen(num, v, mu, s, m=5.0e-5):
+	'''
+	Analytic estimate for number of binaries 
+
+	num--number of star's in sim
+	v--velocity dispersion 
+	m--mass of each star (5x10^-5) by default
+
+	'''
+	r1=1.2
+	rh0=(m/3.)**(1./3.)
+	rh=rh0*r1
+	vh=rh*(r1)**-1.5
+
+	##Numerical pre-factor comes from doing integral of sigma^2* over the disk
+	#integ=(np.exp((9*mu**2)/4. - 3*s)*np.sqrt(mu**(-2))*rh**2*(1 + erf((np.sqrt(mu**(-2))*(3*mu**2 - 2*s))/2.)))/(4.*np.sqrt(np.pi))
+	integ=(np.exp(mu**2/4. - s))/(8.*mu*np.pi**2.5)
+
+	return (4.*np.pi/3.)*integ*num**2*rh0**2.*(v/vh)**-4.
+
 
 def num_analytic(num, v, m=5.0e-5):
 	'''
@@ -23,7 +45,8 @@ def num_analytic(num, v, m=5.0e-5):
 	##Normalization of r^-3 surface density corresponding to a single star.
 	norm=0.32
 	r1=1.2
-	rh=(m/3.)**(1./3.)*r1
+	rh0=(m/3.)**(1./3.)
+	rh=rh0*r1	
 	vh=rh*(r1)**-1.5
 
 	##Numerical pre-factor comes from doing integral over the disk
@@ -83,8 +106,10 @@ ax.set_ylim(ymin, ymax)
 
 t_std=np.arange(1.0e-14,(1.01)*tmax*2.*np.pi, 0.2*np.pi)
 num_bins=[]
-num_bins_analytic=[]
+# num_bins_analytic=[]
 names=np.genfromtxt(base+'/names', dtype=str)
+vs_all=[]
+nstars=[]
 ##Iterating over all runs
 for ii,name in enumerate(names):
 	bins=bin_analysis.BinAnalysis(base+name)
@@ -92,14 +117,16 @@ for ii,name in enumerate(names):
 	vs=np.genfromtxt(base+name.replace('.bin', '_sigs_low'))
 	##Taking only the z-component of the velocity dispersion
 	vs=vs[:,2]
+	ts=bins.ts
+
 	ms=np.genfromtxt(base+name.replace('.bin', '_masses'))
 	mheavy=np.median(ms)
-	ts=bins.ts
 
 	##Select only the light-light binaries
 	idx=np.where(ms<=mheavy)[0][-1]+1
 	bins_tab_light=bins_tab[(bins_tab[:,1]<idx) & (bins_tab[:,2]<idx)]
 	times_arr=bins_tab_light[:,0]
+	nstars.append(idx)
 	
 	# try:
 	# 	v_arr=extrap.extrap1d(interp1d(ts, vs))(times_arr)
@@ -116,25 +143,34 @@ for ii,name in enumerate(names):
 
 	nums=[len(times_arr[np.isclose(times_arr,tt, atol=0., rtol=1.0e-12)]) for tt in ts]
 	#vvh=np.genfromtxt(name.replace('.bin', '_vvh_ratio_low'))
-	nums_analytic = num_analytic(len(ms[ms<=mheavy]), vs, mass)
+	# nums_analytic = num_analytic(len(ms[ms<=mheavy]), vs, mass)
 	#nums_analytic = num_analytic_b(len(ms[ms<=mheavy]), vvh, mass)
 	if len(ts)<10.01*tmax:
 		continue
+	vs_all.append(interp1d(ts, vs)(t_std))
 	##Ensure number of binaries evaluate for the same grid of times
 	nums=interp1d(ts, nums)(t_std)
-	nums_analytic=interp1d(ts, nums_analytic[:len(ts)])(t_std)
+	# nums_analytic=interp1d(ts, nums_analytic[:len(ts)])(t_std)
 	##Append data to list
 	num_bins.append(nums)
-	num_bins_analytic.append(nums_analytic)
+	# num_bins_analytic.append(nums_analytic)
+
+vs=np.mean(vs_all, axis=0)
+pfit = np.genfromtxt(base+'pfit')
+tfit=pfit[:,0]
+mus=pfit[:,1]
+s=pfit[:,2]
+# #Analytic prediction
+nums_med_analytic=num_analytic_gen(np.mean(nstars), vs, interp1d(tfit, mus)(t_std), interp1d(tfit, s)(t_std), mass)
+print np.mean(nstars)
+# nums_med_analytic=num_analytic(np.mean(nstars), vs, mass)
+print nums_med_analytic
 
 
-
-#Analytic prediction
-nums_med_analytic=np.mean(num_bins_analytic, axis=0)
-print nums_med_analytic[-1]
-err=sem(num_bins_analytic, axis=0)
-ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
-			 color=col2, alpha=0.3)
+# print nums_med_analytic[-1]
+# err=sem(num_bins_analytic, axis=0)
+# ax.fill_between(t_std/(2.*np.pi), nums_med_analytic-err, nums_med_analytic+err,\
+# 			 color=col2, alpha=0.3)
 ax.loglog(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari')
 
 
