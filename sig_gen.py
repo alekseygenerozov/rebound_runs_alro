@@ -11,6 +11,6 @@ s0=temp.read()
 temp.close()
 for idx,name in enumerate(dat):
     out=open('sigs_{0}.sh'.format(idx), 'w')
-    s=s0+'\npython /projects/alge9397/code/python/rebound_runs/sig_gen_filt.py {0} 10'.format(name)
+    s=s0+'\npython /projects/alge9397/code/python/rebound_runs/sig_gen_filt.py {0}'.format(name)
     out.write(s)
 out.close()
