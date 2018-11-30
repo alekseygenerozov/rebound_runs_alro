@@ -172,8 +172,10 @@ ax.loglog(t_std/(2.*np.pi), nums_med_analytic, color=col2, label='Slichting+Sari
 ##Median number of binaries and standard deviation as a function of time 
 nums_med=np.mean(num_bins, axis=0)
 err=sem(num_bins, axis=0)
-ax.fill_between(t_std/(2.*np.pi), nums_med-err, nums_med+err,\
+print (nums_med-err)[-1], (nums_med+err)[-1]
+ax.fill_between(t_std/(2.*np.pi), [max(nn, ymin) for nn in nums_med-err], nums_med+err,\
 			 color=col1, alpha=0.3)
+
 ax.loglog(t_std/(2.*np.pi), nums_med, color=col1, label='Simulation')
 # ax.annotate('m='+'{0}'.format(latex_exp.latex_exp(mass)), (0.99*tmax,0.75*ymax), horizontalalignment='right')
 
