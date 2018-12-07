@@ -10,12 +10,12 @@ def vh(m, a):
 	return m**(1./3.)*a**-0.5
 
 name=sys.argv[1]
-bins=bin_analysis.BinAnalysis(name)
+# bins=bin_analysis.BinAnalysis(name)
 ##Set up simulation archive
 #--------------------------------------------------------------------------------------------------_#
 sa=rebound.SimulationArchive(name)
-# ms = np.array([pp.m for pp in sa[0].particles[1:]])
-ms=np.genfromtxt(name.replace('.bin', '_masses'))
+ms = np.array([pp.m for pp in sa[0].particles[1:]])
+#ms=np.genfromtxt(name.replace('.bin', '_masses'))
 #--------------------------------------------------------------------------------------------------_#
 ##Velocity dispersions to file
 sigs=np.empty([len(sa), 3])
