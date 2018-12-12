@@ -149,10 +149,9 @@ def main():
 		p=config.getfloat(ss, 'p')
 		ang=config.getfloat(ss, 'ang')
 
-		##Use AM's code to generate disk with aligned eccentricity vectors, but a small scatter in i and both omegas...
-		inc, Omega, omega=gen_disk(ang)
-
 		for l in range(0,N): # Adds stars
+			##Use AM's code to generate disk with aligned eccentricity vectors, but a small scatter in i and both omegas...
+			inc, Omega, omega=gen_disk(ang*np.pi/180.)
 			a0=density(a_min, a_max, p)
 			M = rand.uniform(0., 2.*np.pi)
 			sim.add(m = m, a = a0, e = e, inc=inc, Omega = Omega, omega = omega, M = M, primary=sim.particles[0])

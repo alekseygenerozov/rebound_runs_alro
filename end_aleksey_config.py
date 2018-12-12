@@ -61,21 +61,21 @@ def main():
 		description='Set up a rebound run')
 	parser.add_argument('--config', nargs=1, default='config',
 		help='File containing simulation parameters')
-	parser.add_argument('--keep_bins', action='store_true',
-		help="Don't delete bins from simulation")
+	# parser.add_argument('--keep_bins', action='store_true',
+	# 	help="Don't delete bins from simulation")
 
 
 	args=parser.parse_args()
 	config_file=args.config
-	keep_bins=args.keep_bins
-	print keep_bins
+	# keep_bins=args.keep_bins
+	#print keep_bins
 
-	print config_file
+	#print config_file
 	tag=str(uuid.uuid4())
 
 	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
-		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
+		'gravity':'basic', 'integrator':'ias15', 'dt':'0', 'buffer':'1.', 'keep_bins':'False', \
 		'a_min':'1.', 'a_max':'2.', 'i_max':'5.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
 		'p':'2'}, dict_type=OrderedDict)
 	# config.optionxform=str
@@ -87,11 +87,15 @@ def main():
 	##Length of simulation and interval between snapshots
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
+	keep_bins=config.getboolean('params', 'keep_bins')
 	rt=config.getfloat('params', 'rt')
 	coll=config.get('params', 'coll')
+	buff=config.getfloat('params', 'buffer')
 
 	print pRun, pOut, rt, coll
 	sections=config.sections()
+	##Assume sections are in the same order as in the config file.
+	sections=sections[1:]
 	sim = rebound.Simulation()
 	sim.G = 1.	
 	sim.add(m = 1, r=rt) # BH
@@ -109,10 +113,11 @@ def main():
 	##Add particles; Can have different sections with different types of particles (e.g. heavy and light)
 	##see the example config file in repository. Only require section is params which defines global parameters 
 	##for the simulation (pRun and pOut).
+	nparts={}
+	num={}
 	for ss in sections:
-		if ss=='params':
-			continue
-		N=int(config.get(ss, 'N'))
+		num[ss]=int(config.get(ss, 'N'))
+		N=int(buff*num[ss])
 		e=config.getfloat(ss, 'e')
 		m=config.getfloat(ss, 'm')
 		a_min=config.getfloat(ss, 'a_min')
@@ -124,10 +129,11 @@ def main():
 		for j in range(0, N + 1):
 			M[j] = rand.uniform(0, 2 * np.pi)
 
-
+		N0=len(sim.particles)
 		for l in range(0,N): # Adds stars
 			a0=density(a_min, a_max, p)
 			sim.add(m = m, a = a0, e = e, inc=np.random.uniform(0, i_max * np.pi / 180.0), Omega = 0, omega = 0, M = M[l], primary=sim.particles[0])
+		nparts[ss]=(N0,N0+N-1)
 		#print N, m, e, a_min, a_max, i_max
 	
 	f=open('init_disk', 'w')
@@ -153,14 +159,30 @@ def main():
 		while len(bins>0):
 			##Delete in reverse order (else the indices would become messed up)
 			to_del=(np.sort(np.unique(bins[:,1]))[::-1]).astype(int)
+			##print len(to_del)
 			for idx in to_del:
 				sim.remove(idx)
 			sim.integrate(sim.t+sim.t*1.0e-14)
 			bins=bin_find_sim(sim)
+			N0=1
+			for ss in sections:
+				del1=len(np.intersect1d(range(nparts[ss][0],nparts[ss][-1]+1), to_del))
+				tot1=nparts[ss][-1]-nparts[ss][0]+1
+				nparts[ss]=(N0, N0+tot1-del1-1)
+				N0=N0+tot1-del1
 
-	ms=np.array([pp.m for pp in sim.particles])
+	print len(sim.particles)
+	for ss in sections[::-1]:
+		to_del=range(nparts[ss][0]+num[ss], nparts[ss][-1]+1)[::-1]
+		for idx in to_del:
+			sim.remove(idx)
+
+	
+	ms=np.array([pp.m for pp in sim.particles[1:]])
+	print len(ms[ms<=np.median(ms)])
 	sim.collision=coll
 	sim.collision_resolve=get_tde
+
 
 	##Set up simulation archive for output
 	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
@@ -171,7 +193,7 @@ def main():
 	print rebound.__version__
 	sim.integrate(pRun*2*np.pi)
 	en2=sim.calculate_energy()
-	print abs(en2-en)/en
+	#print abs(en2-en)/en
 	fen.write('_{0:2.3g}'.format(abs(en2-en)/en))
 	fen.close()
 
