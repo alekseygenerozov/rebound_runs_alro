@@ -109,7 +109,7 @@ def main():
 	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
 		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
-		'a_min':'1.', 'a_max':'2.', 'ang':'2.', 'm':'5e-5', 'keep_bins':'False', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
+		'a_min':'1.', 'a_max':'2.', 'ang':'2.', 'm':'5e-5', 'keep_bins':'False', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.1', 
 		'p':'1'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
@@ -197,7 +197,7 @@ def main():
 	sim.collision_resolve=get_tde
 
 	##Set up simulation archive for output
-	sim.automateSimulationArchive(name,interval=np.pi*pOut,deletefile=True)
+	sim.automateSimulationArchive(name,interval=2.0*np.pi*pOut,deletefile=True)
 	#sim.heartbeat=heartbeat
 	sim.move_to_com()
 
