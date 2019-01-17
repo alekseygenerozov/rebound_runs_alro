@@ -3,11 +3,11 @@
 import ConfigParser
 import argparse
 import uuid
-# import sys
+import sys
 
 import numpy as np
 from collections import OrderedDict
-# sys.path.append('/usr/local/lib/python2.7/dist-packages/')
+sys.path.append('/home/aleksey/rebound/')
 import rebound
 import random as rand
 from rebound_runs.bin_analysis import bin_find_sim

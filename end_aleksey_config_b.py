@@ -28,10 +28,16 @@ import math
 #     return (1./min1-r*(1./min1-1./max1))**-1.
 
 def rotate_vec(angle,axis,vec):    
+	'''
+	Rotate vector vec by angle around axis
+	'''
 	vRot = vec*math.cos(angle) + np.cross(axis,vec)*math.sin(angle) + axis*np.dot(axis,vec)*(1 -math.cos(angle))
 	return vRot	
 
 def gen_disk(ang):
+	'''
+	This is from some old code that starts with perfectly aligned e and j vectors and then rotates them by a small amount
+	'''
 	ehat = np.array([1,0,0])
 	jhat = np.array([0,0,1])
 	bhat = np.cross(jhat,ehat)    # rotate jhat by angle1 over major axis and angle minor axis
@@ -90,22 +96,20 @@ def main():
 		description='Set up a rebound run')
 	parser.add_argument('--config', nargs=1, default='config',
 		help='File containing simulation parameters')
-	parser.add_argument('--keep_bins', action='store_true',
-		help="Don't delete bins from simulation")
+	# parser.add_argument('--keep_bins', action='store_true',
+	# 	help="Don't delete bins from simulation")
 
 
+	##Parsing command line arguments.
 	args=parser.parse_args()
 	config_file=args.config
-	keep_bins=args.keep_bins
-	print keep_bins
-
-	print config_file
+	##Unique tag for output file.
 	tag=str(uuid.uuid4())
 
 	##Default stellar parameters 
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
 		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
-		'a_min':'1.', 'a_max':'2.', 'ang':'2.', 'm':'5e-5', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
+		'a_min':'1.', 'a_max':'2.', 'ang':'2.', 'm':'5e-5', 'keep_bins':'False', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'0.2', 
 		'p':'1'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
@@ -116,14 +120,17 @@ def main():
 	##Length of simulation and interval between snapshots
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
+	keep_bins=config.getboolean('params', 'keep_bins')
 	rt=config.getfloat('params', 'rt')
 	coll=config.get('params', 'coll')
 
 	print pRun, pOut, rt, coll
 	sections=config.sections()
+	##Initialized the rebound simulation
 	sim = rebound.Simulation()
 	sim.G = 1.	
-	sim.add(m = 1, r=rt) # BH
+	##Central object
+	sim.add(m = 1, r=rt) 
 	sim.gravity=config.get('params', 'gravity')
 	sim.integrator=config.get('params', 'integrator')
 	dt=config.getfloat('params', 'dt')
