@@ -10,7 +10,7 @@ from collections import OrderedDict
 # sys.path.append('/usr/local/lib/python2.7/dist-packages/')
 import rebound
 import random as rand
-from rebound_runs.bin_analysis import bin_find_sim
+from bin_analysis import bin_find_sim
 import math
 
 # Density function for semimajor axes (Hayden's implementation)
