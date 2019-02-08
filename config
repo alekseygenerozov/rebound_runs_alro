@@ -1,6 +1,6 @@
 [params]
-pRun = 1.0e-8
-keep_bins=True
+pRun = 3
+keep_bins=False
 
 [stars]
 N=100

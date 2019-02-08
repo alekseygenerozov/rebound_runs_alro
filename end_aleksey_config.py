@@ -10,7 +10,7 @@ from collections import OrderedDict
 sys.path.append('/home/aleksey/rebound/')
 import rebound
 import random as rand
-from rebound_runs.bin_analysis import bin_find_sim
+from bin_analysis import bin_find_sim
 
 # Density function for semimajor axes (Hayden's implementation)
 # def density(min1, max1):

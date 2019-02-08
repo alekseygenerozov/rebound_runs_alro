@@ -202,8 +202,16 @@ def main():
 	sim.move_to_com()
 
 	en=sim.calculate_energy()
-	print rebound.__version__
-	sim.integrate(pRun*2*np.pi)
+	print sim.N, rebound.__version__
+	t=0.0
+	orb_idx=0
+	while(t<pRun*2.0*np.pi):
+		orbits=sim.calculate_orbits(primary=sim.particles[0])
+		np.savetxt(name.replace('.bin', '_orb_{0}.dat'.format(orb_idx)), [[oo.a, oo.e, oo.inc, oo.Omega, oo.omega, oo.f] for oo in orbits])
+		sim.integrate(sim.t+2.0*np.pi)
+		t+=2.0*np.pi
+		orb_idx+=1
+	# sim.integrate(pRun*2*np.pi)
 	en2=sim.calculate_energy()
 	print abs(en2-en)/en
 	fen.write('_{0:2.3g}'.format(abs(en2-en)/en))
