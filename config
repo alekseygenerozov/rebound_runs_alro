@@ -1,9 +1,10 @@
 [params]
-pRun = 3
+pRun = 1
 keep_bins=False
 
 [stars]
 N=100
+frac=0.01
 
 [bh]
 N=1

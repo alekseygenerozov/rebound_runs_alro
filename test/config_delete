@@ -1,0 +1,13 @@
+[params]
+pRun = 0
+keep_bins=False
+
+[stars]
+N = 100
+m = 1e-5
+
+[bhs]
+N = 10
+m = 1e-4
+
+

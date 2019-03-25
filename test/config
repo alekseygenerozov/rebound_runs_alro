@@ -1,0 +1,7 @@
+[params]
+pRun = 0
+keep_bins=True
+
+[stars]
+p=2
+

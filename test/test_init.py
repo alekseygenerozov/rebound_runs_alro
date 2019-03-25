@@ -15,7 +15,7 @@ def cum_dist(x):
 
 def test_init():
 	bc.bash_command('rm archive*')
-	bc.bash_command('python ../end_aleksey_config.py --keep_bins')
+	bc.bash_command('python ../end_aleksey_config_b.py')
 	name=bc.bash_command("echo archive*bin").replace('\n', '')
 	sa=rebound.SimulationArchive(name)
 	sim=sa[0]
@@ -32,7 +32,7 @@ def test_init():
 
 def test_init_circ():
 	bc.bash_command('rm archive*')
-	bc.bash_command('python ../end_aleksey_config.py --keep_bins --config config2')
+	bc.bash_command('python ../end_aleksey_config_b.py --config config2')
 	name=bc.bash_command("echo archive*bin").replace('\n', '')
 	sa=rebound.SimulationArchive(name)
 	sim=sa[0]
@@ -43,5 +43,26 @@ def test_init_circ():
 	odat=sim.calculate_orbits(primary=sim.particles[0])
 	eccs=np.array([oo.e for oo in odat])
 	assert np.allclose(eccs, 0.)
+
+
+def test_frac():
+	bc.bash_command('rm archive*')
+	bc.bash_command('python ../end_aleksey_config_b.py --config config_frac')
+	name=bc.bash_command("echo archive*bin").replace('\n', '')
+	sa=rebound.SimulationArchive(name)
+	sim=sa[0]
+	ms=np.array([pp.m for pp in sim.particles[1:]])
+	assert np.allclose(ms, 0.01/200.0)
+
+def test_delete():
+	bc.bash_command('rm archive*')
+	bc.bash_command('python ../end_aleksey_config_b.py --config config_delete')
+	name=bc.bash_command("echo archive*bin").replace('\n', '')
+	sa=rebound.SimulationArchive(name)
+	sim=sa[0]
+
+	ms=np.array([pp.m for pp in sim.particles[1:]])
+	assert len(ms[ms==1.0e-5])==100
+	assert len(ms[ms==1.0e-4])==10
 
 

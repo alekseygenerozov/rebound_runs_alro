@@ -1,0 +1,8 @@
+[params]
+pRun = 0
+keep_bins=True
+
+[stars]
+N = 200
+e = 0
+m = 5.0e-4
