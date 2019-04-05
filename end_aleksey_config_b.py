@@ -13,6 +13,8 @@ import random as rand
 from bin_analysis import bin_find_sim
 import math
 
+import os
+
 def rotate_vec(angle,axis,vec):    
 	'''
 	Rotate vector vec by angle around axis (couter-clockwise)
@@ -103,6 +105,7 @@ def main():
 	##Name of our put file 
 	name=config.get('params', 'name')
 	name=name+"_"+tag+".bin"
+	name=os.path.join(os.path.dirname(__file__), name)
 	##Length of simulation and interval between snapshots
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
