@@ -91,6 +91,7 @@ def main():
 	##Parsing command line arguments.
 	args=parser.parse_args()
 	config_file=args.config
+	config_file=os.path.join(os.path.dirname(__file__), config_file)
 	##Unique tag for output file.
 	tag=str(uuid.uuid4())
 
