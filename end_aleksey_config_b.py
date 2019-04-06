@@ -91,7 +91,6 @@ def main():
 	##Parsing command line arguments.
 	args=parser.parse_args()
 	config_file=args.config
-	config_file=os.path.join(os.path.dirname(__file__), config_file)
 	##Unique tag for output file.
 	tag=str(uuid.uuid4())
 
@@ -99,14 +98,14 @@ def main():
 	config=ConfigParser.SafeConfigParser(defaults={'name': 'archive'.format(tag), 'N':'100', 'e':'0.7',
 		'gravity':'basic', 'integrator':'ias15', 'dt':'0', \
 		'a_min':'1.', 'a_max':'2.', 'ang1_mean':'0', 'ang2_mean':'0', 'ang3_mean':'0', 'ang1':'2.', 'ang2':'2.', 'ang3':'2.', 'm':'5e-5', 'keep_bins':'False', 'rt':'1.0e-4', 'coll':'line', 'pRun':'500', 'pOut':'50', 
-		'p':'1', 'frac':'nan'}, dict_type=OrderedDict)
+		'p':'1', 'frac':'nan', 'outDir':'./'}, dict_type=OrderedDict)
 	# config.optionxform=str
 	config.read(config_file)
 
 	##Name of our put file 
 	name=config.get('params', 'name')
 	name=name+"_"+tag+".bin"
-	name=os.path.join(os.path.dirname(__file__), name)
+	name=config.get('params', 'outDir')+'/'+name
 	##Length of simulation and interval between snapshots
 	pRun=config.getfloat('params', 'pRun')
 	pOut=config.getfloat('params', 'pOut')
