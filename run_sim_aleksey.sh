@@ -7,7 +7,6 @@
 #SBATCH --job-name=ENDs
 #SBATCH --output=OUT-%j.out
 #SBATCH --mail-type=all
-#SBATCH --mail-user=alge9397@colorado.edu
 
 module load python/2.7.11
 
